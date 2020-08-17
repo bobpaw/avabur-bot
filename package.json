@@ -1,0 +1,26 @@
+{
+  "name": "avabur-bot",
+  "version": "0.1.0",
+  "description": "Provides Discord notifications for Relics of Avabur",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bobpaw/avabur-bot.git"
+  },
+  "keywords": [
+    "avabur",
+    "discord"
+  ],
+  "author": "Aiden Woodruff",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bobpaw/avabur-bot/issues"
+  },
+  "homepage": "https://github.com/bobpaw/avabur-bot#readme",
+  "dependencies": {
+    "discord.js": "^12.3.1"
+  }
+}
