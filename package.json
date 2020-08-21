@@ -1,7 +1,7 @@
 {
   "name": "avabur-bot",
-  "version": "0.1.0",
-  "description": "Provides Discord notifications for Relics of Avabur",
+  "version": "1.0.0",
+  "description": "Provides functions to work in concert with a Notifications of Avabur webhook. !luck requires mysql, !market gets currency values, !ping replies pong",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
