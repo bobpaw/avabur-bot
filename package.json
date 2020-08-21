@@ -24,6 +24,7 @@
     "discord.js": "^12.3.1",
     "mathjs": "^7.1.0",
     "mysql": "^2.18.1",
+    "node-request": "0.0.3",
     "simple-git": "^2.19.0"
   },
   "devDependencies": {
