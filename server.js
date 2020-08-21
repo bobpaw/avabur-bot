@@ -142,7 +142,7 @@ client.on("message", msg => {
 				}
 			}
 			msg.reply(reply.replace(/, $/, ""));
-		}
+		});
 	}
 	if (msg.content === "!source") {
 		msg.reply("avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot");
