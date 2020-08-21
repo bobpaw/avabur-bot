@@ -1,7 +1,16 @@
 const Secrets = require("./secrets.js");
 
-const https = require("https");
-const fs = require("fs");
+const fetch = require("node-fetch");
+
+const Git = require("simple-git")();
+const basic_math = require("mathjs");
+const math = basic_math.create(basic_math.all);
+math.import({
+	'import': function () { throw new Error('Function import is disabled'); },
+	'createUnit': function () { throw new Error('Function createUnit is disabled'); },
+	'simplify': function () { throw new Error('Function simplify is disabled'); },
+	'derivative': function () { throw new Error('Function derivative is disabled'); }
+}, { override: true });
 
 const Discord = require("discord.js");
 const client = new Discord.Client();
@@ -18,6 +27,42 @@ const sql_pool = mysql.createPool({
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 });
+
+async function getVersion () {
+	try {
+		let branch = await Git.branch();
+		let cur_tag = await Git.raw(["describe", "--exact-match", "--tags", "HEAD"]).catch(e => {
+			if (!/fatal: no tag exactly matches/.test(e.message)) throw e;
+		});
+		if (cur_tag && !cur_tag.failed && /v\d\.\d\.\d(?:-[^ ]+)?/.test(cur_tag)) {
+			console.log(`Providing version ${cur_tag}`);
+			return cur_tag;
+		} else if (branch["current"] === "experimental") {
+			let commit_hash = await Git.revparse(["--short", "HEAD"]);
+			console.log(`Providing current commit hash ${commit_hash}`);
+			return commit_hash;
+		} else {
+			console.log(`Providing current branchname ${branch["current"]}`);
+			return branch["current"]
+		}
+	} catch (e) {
+		throw e;
+	}
+}
+
+async function get_currency_prices() {
+	try {
+		let prices = await fetch("https://www.avabur.com/api/market/currency").then(res => res.json());
+		return prices;
+	} catch (e) {
+		throw e;
+	}
+}
+
+function add_commas(number) {
+	// https://stackoverflow.com/a/2901298/3413725
+	return number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+}
 
 client.on("message", msg => {
 	if (msg.author.id !== client.user.id) {
@@ -45,7 +90,7 @@ client.on("message", msg => {
 			msg.reply(`Event luck is at ${(time_since_last / avg * 100).toFixed(2)}%.`);
 		});
 	}
-	if (/!market/.test(msg.content)) {
+	if (/^!market/.test(msg.content)) {
 		console.log("Getting market currency values.");
 		let tags = msg.content.split(" ");
 		let currencies = []
@@ -100,45 +145,80 @@ client.on("message", msg => {
 				"Do nothing";
 			} // switch(tag)
 		} // for (tag of tags)
-		https.get("https://www.avabur.com/api/market/currency", response => {
-			const {statusCode} = response;
-			const contentType = response.headers["content-type"];
-
-			let error;
-			if (statusCode !== 200) {
-				error = new Error(`Request failed. Status Code: ${statusCode}`);
-			} else if (!/^application\/json/.test(contentType)) {
-				error = new Error(`Invalid content-type. Expected application/json but received ${contentType}`);
-			}
-			if (error) {
-				console.error(error.message);
-				response.resume();
-				return;
-			}
-
-			response.setEncoding("utf8");
-			let responseText = "";
-			response.on("data", chunk => { responseText += chunk; });
-			response.on("end", function () {
-				try {
-					const currency_prices = JSON.parse(responseText);
-					let reply = ""
-					for (const currency of currencies) {
-						if (currency in currency_prices) {
-							// https://stackoverflow.com/a/2901298/3413725
-							reply += `${currency}: ${currency_prices[currency][0].price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}, `;
-						} else {
-							reply += `Nobody is selling ${currency}, `;
-						}
-					}
-					msg.reply(reply.replace(/, $/, ""));
-				} catch (e) {
-					console.error(e.message);
+		get_currency_prices().then(currency_prices => {
+			let reply = "";
+			for (const currency of currencies) {
+				if (currency in currency_prices) {
+					reply += `${currency}: ${add_commas(currency_prices[currency][0].price)}, `;
+				} else {
+					reply += `Nobody is selling ${currency}, `;
 				}
-			});
-		}).on("error", (e) => {
-			console.error(`Got error: ${e.message}`);
+			}
+			msg.reply(reply.replace(/, $/, ""));
 		});
+	}
+	if (msg.content === "!source") {
+		msg.reply("avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot");
+	}
+	if (/^!(?:math|calc(?:ulate)?) /.test(msg.content)) {
+		get_currency_prices().then(currency_prices => {
+			let scope = {
+				units: function (curr, n) {
+					if (!curr in currency_prices) throw new Error("Invalid currency");
+					let price = 0;
+					const listings = currency_prices[curr];
+					while (n > listings[0].amount) {
+						price += listings[0].amount * listings[0].price;
+						n -= listings[0].amount;
+						listings.shift();
+					}
+					if (n > 0) {
+						price += listings[0].price * n;
+					}
+					return price;
+				},
+				cry: "Crystal",
+				plat: "Platinum",
+				food: "Food",
+				wood: "Wood",
+				iron: "Iron",
+				stone: "Stone",
+				mat: "Crafting Material",
+				frag: "Gem Fragment",
+				c: "Crystal",
+				p: "Platinum",
+				f: "Food",
+				w: "Wood",
+				i: "Iron",
+				s: "Stone",
+				cr: "Crafting Material",
+				f: "Gem Fragment"
+			};
+			function expand_numeric_literals(number) {
+				let final_number = number.replace(/\b(\d+(?:\.\d+)?)[Tt]/g, "($1 * 1000000000000)")
+					.replace(/\b(\d+(?:\.\d+)?)[Bb]/g, "($1 * 1000000000)")
+					.replace(/\b(\d+(?:\.\d+)?)[Mm]/g, "($1 * 1000000)")
+					.replace(/\b(\d+(?:\.\d+)?)[Kk]/g, "($1 * 1000)");
+				return final_number;
+            }
+			let expression = expand_numeric_literals(msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(/(?<!\.\d*)(?<=\d+),(?=(\d{3})+(?!\d))/g, "").replace(/evaluate|parse/, ""));
+			console.log(`Calculating expression: ${expression}`);
+			let re = "";
+			try {
+				re = add_commas(math.evaluate(expression, scope));
+				console.log(`Expression evaluated to ${re}`);
+			} catch (e) {
+				console.error("math.evaluate error: %s", e.message);
+				re = `Error evaluating ${msg.content} expression \`${msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "")}\` -> \`${expression}\``;
+			}
+			msg.reply(re);
+		});
+	}
+	if (msg.content === "!version") {
+		getVersion().then(val => {msg.reply(val);});
+	}
+	if (msg.content === "!help" || msg.content === "!commands") {
+		msg.reply("!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate");
 	}
 });
 
