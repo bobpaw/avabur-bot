@@ -122,7 +122,6 @@ client.on("message", msg => {
 			response.on("end", function () {
 				try {
 					const currency_prices = JSON.parse(responseText);
-					console.log(JSON.stringify(currency_prices));
 					let reply = ""
 					for (const currency of currencies) {
 						if (currency in currency_prices) {
