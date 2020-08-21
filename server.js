@@ -51,6 +51,11 @@ async function get_currency_prices() {
     }
 }
 
+function add_commas(number) {
+	// https://stackoverflow.com/a/2901298/3413725
+	return number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+}
+
 client.on("message", msg => {
 	if (msg.author.id !== client.user.id) {
 		console.log(`${msg.author.tag} (${msg.author.username}) - ${msg.author.id}`);
@@ -136,8 +141,7 @@ client.on("message", msg => {
 			let reply = "";
 			for (const currency of currencies) {
 				if (currency in currency_prices) {
-					// https://stackoverflow.com/a/2901298/3413725
-					reply += `${currency}: ${currency_prices[currency][0].price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}, `;
+					reply += `${currency}: ${add_commas(currency_prices[currency][0].price)}, `;
 				} else {
 					reply += `Nobody is selling ${currency}, `;
 				}
@@ -181,8 +185,8 @@ client.on("message", msg => {
 				m: "Crafting Material",
 				f: "Gem Fragment"
 			}
-			let re = math.evaluate(msg.content.replace(/^!(?:math|calc(?:ulate)?) /, ""), scope);
-			msg.reply(re);
+			let re = math.evaluate(msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(",", ""), scope);
+			msg.reply(add_commas(re));
         })
     }
 	if (msg.content === "!version") {
