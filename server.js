@@ -197,7 +197,7 @@ client.on("message", msg => {
 			let expression = msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(",", "").replace("evaluate", "")
 				.replace(/(?<=\d)[Tt]/g, "000b").replace(/(?<=\d)[Bb]/g, "000m").replace(/(?<=\d)[Mm]/g, "000k").replace(/(?<=\d)[Kk]/g, "000");
 			console.log(`Calculating expression: ${expression}`);
-			let re = evaluate_expression(expression, scope);
+			let re = math.evaluate(expression, scope);
 			console.log(`Expression evaluated to ${re}`);
 			msg.reply(add_commas(re));
         })
