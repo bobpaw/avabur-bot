@@ -5,6 +5,7 @@ const fetch = require("node-fetch");
 const Git = require("simple-git")();
 const basic_math = require("mathjs");
 const math = basic_math.create(basic_math.all);
+const evaluate_expression = math.evaluate;
 math.import({
 	'import': function () { throw new Error('Function import is disabled'); },
 	'createUnit': function () { throw new Error('Function createUnit is disabled'); },
