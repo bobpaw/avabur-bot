@@ -140,6 +140,9 @@ client.on("message", msg => {
 			console.error(`Got error: ${e.message}`);
 		});
 	}
+	if (msg.content === "!source") {
+		msg.reply("avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot");
+	}
 });
 
 client.login(Secrets.bot_token);
