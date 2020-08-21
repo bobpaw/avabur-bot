@@ -1,8 +1,11 @@
 const Secrets = require("./secrets.js");
 
+const https = require("https");
+const fs = require("fs");
+
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const fs = require("fs");
+
 const mysql = require("mysql");
 const sql_pool = mysql.createPool({
 	connectionLimit: 5,
@@ -17,7 +20,9 @@ client.on("ready", () => {
 });
 
 client.on("message", msg => {
-	if (msg.author.id !== client.user.id) console.log(msg.author.id);
+	if (msg.author.id !== client.user.id) {
+		console.log(`${msg.author.tag} (${msg.author.username}) - ${msg.author.id}`);
+	}
 	if (msg.content === "!ping") {
 		msg.reply("pong");
 	}
@@ -26,6 +31,114 @@ client.on("message", msg => {
 		sql_pool.query("insert into events (time) values (current_timestamp())", function (err, _unused) {
 			if (err) throw err;
 			console.log("Logged current time in events table");
+		});
+	}
+	if (msg.content === "!luck") {
+		console.log("Calculating current luck." );
+		sql_pool.query("select unix_timestamp(time) from events;", function (err, result) {
+			if (err) throw err;
+			result = result.map(x => x["unix_timestamp(time)"]);
+			let changes = result.map((x, i, a) => (i > 0 ? x - a[i - 1]: 0));
+			changes.shift();
+			let avg = changes.reduce((total, x) => total + x, 0) / changes.length;
+			let time_since_last = Date.now() / 1000 - result[result.length - 1];
+			msg.reply(`Event luck is at ${(time_since_last / avg * 100).toFixed(2)}%.`);
+		});
+	}
+	if (/!market/.test(msg.content)) {
+		console.log("Getting market currency values.");
+		let tags = msg.content.split(" ");
+		let currencies = []
+		let ingredients = []
+		for (const tag of tags) {
+			switch (tag.toLowerCase()) {
+			case "crystals":
+			case "crystal":
+			case "cry":
+			case "c":
+				currencies.push("Crystal");
+				break;
+			case "platinum":
+			case "plats":
+			case "plat":
+			case "p":
+				currencies.push("Platinum");
+				break;
+			case "food":
+			case "f":
+				currencies.push("Food");
+				break;
+			case "wood":
+			case "w":
+				currencies.push("Wood");
+				break;
+			case "stone":
+			case "s":
+				currencies.push("Stone");
+				break;
+			case "iron":
+			case "i":
+				currencies.push("Iron");
+				break;
+			case "crafting_materials":
+			case "mats":
+			case "crafting":
+			case "materials":
+			case "m":
+				currencies.push("Crafting Material");
+				break;
+			case "gem_fragments":
+			case "gem":
+			case "gems":
+			case "frags":
+			case "frag":
+			case "f":
+			case "g":
+				currencies.push("Gem Fragment");
+				break;
+			default:
+				"Do nothing";
+			} // switch(tag)
+		} // for (tag of tags)
+		https.get("https://www.avabur.com/api/market/currency", response => {
+			const {statusCode} = response;
+			const contentType = response.headers["content-type"];
+
+			let error;
+			if (statusCode !== 200) {
+				error = new Error(`Request failed. Status Code: ${statusCode}`);
+			} else if (!/^application\/json/.test(contentType)) {
+				error = new Error(`Invalid content-type. Expected application/json but received ${contentType}`);
+			}
+			if (error) {
+				console.error(error.message);
+				response.resume();
+				return;
+			}
+
+			response.setEncoding("utf8");
+			let responseText = "";
+			response.on("data", chunk => { responseText += chunk; });
+			response.on("end", function () {
+				try {
+					const currency_prices = JSON.parse(responseText);
+					console.log(JSON.stringify(currency_prices));
+					let reply = ""
+					for (const currency of currencies) {
+						if (currency in currency_prices) {
+							// https://stackoverflow.com/a/2901298/3413725
+							reply += `${currency}: ${currency_prices[currency][0].price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}, `;
+						} else {
+							reply += `Nobody is selling ${currency}, `;
+						}
+					}
+					msg.reply(reply.replace(/, $/, ""));
+				} catch (e) {
+					console.error(e.message);
+				}
+			});
+		}).on("error", (e) => {
+			console.error(`Got error: ${e.message}`);
 		});
 	}
 });
