@@ -8,7 +8,6 @@ const math = basic_math.create(basic_math.all);
 math.import({
 	'import': function () { throw new Error('Function import is disabled'); },
 	'createUnit': function () { throw new Error('Function createUnit is disabled'); },
-	'parse': function () { throw new Error('Function parse is disabled'); },
 	'simplify': function () { throw new Error('Function simplify is disabled'); },
 	'derivative': function () { throw new Error('Function derivative is disabled'); }
 }, { override: true });
@@ -194,7 +193,7 @@ client.on("message", msg => {
 				cr: "Crafting Material",
 				f: "Gem Fragment"
 			}
-			let expression = msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(",", "").replace("evaluate", "")
+			let expression = msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(",", "").replace(/evaluate|parse/, "")
 				.replace(/(?<=\d)[Tt]/g, "000b").replace(/(?<=\d)[Bb]/g, "000m").replace(/(?<=\d)[Mm]/g, "000k").replace(/(?<=\d)[Kk]/g, "000");
 			console.log(`Calculating expression: ${expression}`);
 			let re = math.evaluate(expression, scope);
