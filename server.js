@@ -131,17 +131,18 @@ client.on("message", msg => {
 				"Do nothing";
 			} // switch(tag)
 		} // for (tag of tags)
-		const currency_prices = get_currency_prices();
-		let reply = ""
-		for (const currency of currencies) {
-			if (currency in currency_prices) {
-				// https://stackoverflow.com/a/2901298/3413725
-				reply += `${currency}: ${currency_prices[currency][0].price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}, `;
-			} else {
-				reply += `Nobody is selling ${currency}, `;
+		get_currency_prices().then(currency_prices => {
+			let reply = "";
+			for (const currency of currencies) {
+				if (currency in currency_prices) {
+					// https://stackoverflow.com/a/2901298/3413725
+					reply += `${currency}: ${currency_prices[currency][0].price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}, `;
+				} else {
+					reply += `Nobody is selling ${currency}, `;
+				}
 			}
+			msg.reply(reply.replace(/, $/, ""));
 		}
-		msg.reply(reply.replace(/, $/, ""));
 	}
 	if (msg.content === "!source") {
 		msg.reply("avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot");
