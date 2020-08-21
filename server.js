@@ -46,7 +46,7 @@ client.on("message", msg => {
 			msg.reply(`Event luck is at ${(time_since_last / avg * 100).toFixed(2)}%.`);
 		});
 	}
-	if (/!market/.test(msg.content)) {
+	if (/^!market/.test(msg.content)) {
 		console.log("Getting market currency values.");
 		let tags = msg.content.split(" ");
 		let currencies = []
