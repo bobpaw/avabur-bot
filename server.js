@@ -56,7 +56,7 @@ async function get_currency_prices() {
 		return prices;
 	} catch (e) {
 		throw e;
-    }
+	}
 }
 
 function add_commas(number) {
@@ -192,15 +192,21 @@ client.on("message", msg => {
 				s: "Stone",
 				cr: "Crafting Material",
 				f: "Gem Fragment"
-			}
-			let expression = msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(/(?<!\.\d*)(?<=\d+),(?=(\d{3})+(?!\d))/g, "").replace(/evaluate|parse/, "")
-				.replace(/(?<=\d)[Tt]/g, "000b").replace(/(?<=\d)[Bb]/g, "000m").replace(/(?<=\d)[Mm]/g, "000k").replace(/(?<=\d)[Kk]/g, "000");
+			};
+			function expand_numeric_literals(number) {
+				let final_number = number.replace(/\b(\d+(?:\.\d+)?)[Tt])/g, "($1 * 1000000000000)")
+					.replace(/\b(\d+(?:\.\d+)?)[Bb])/g, "($1 * 1000000000)")
+					.replace(/\b(\d+(?:\.\d+)?)[Mm])/g, "($1 * 1000000)")
+					.replace(/\b(\d+(?:\.\d+)?)[Kk])/g, "($1 * 1000)");
+				return final_number;
+            }
+			let expression = expand_numeric_literals(msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(/(?<!\.\d*)(?<=\d+),(?=(\d{3})+(?!\d))/g, "").replace(/evaluate|parse/, ""));
 			console.log(`Calculating expression: ${expression}`);
 			let re = math.evaluate(expression, scope);
 			console.log(`Expression evaluated to ${re}`);
 			msg.reply(add_commas(re));
-        })
-    }
+		});
+	}
 	if (msg.content === "!version") {
 		getVersion().then(val => {msg.reply(val);});
 	}
