@@ -3,7 +3,17 @@ const Secrets = require("./secrets.js");
 const fetch = require("node-fetch");
 
 const Git = require("simple-git")();
-const math = require("mathjs");
+const basic_math = require("mathjs");
+const math = basic_math.create(basic_math.all);
+math.import({
+	'import': function () { throw new Error('Function import is disabled'); },
+	'createUnit': function () { throw new Error('Function createUnit is disabled'); },
+	'evaluate': function () { throw new Error('Function evaluate is disabled'); },
+	'parse': function () { throw new Error('Function parse is disabled'); },
+	'simplify': function () { throw new Error('Function simplify is disabled'); },
+	'derivative': function () { throw new Error('Function derivative is disabled'); }
+}, { override: true })
+
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
@@ -182,10 +192,10 @@ client.on("message", msg => {
 				w: "Wood",
 				i: "Iron",
 				s: "Stone",
-				m: "Crafting Material",
+				cr: "Crafting Material",
 				f: "Gem Fragment"
 			}
-			let expression = msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(",", "");
+			let expression = msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(",", "").replace(/[Tt]/g, "000b").replace(/[Bb]/g, "000m").replace(/[Mm]/g, "000k").replace(/[Kk]/g, "000");
 			console.log(`Calculating expression: ${expression}`);
 			let re = math.evaluate(expression, scope);
 			console.log(`Expression evaluated to ${re}`);
