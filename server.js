@@ -193,7 +193,7 @@ client.on("message", msg => {
 				cr: "Crafting Material",
 				f: "Gem Fragment"
 			}
-			let expression = msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(",", "").replace(/evaluate|parse/, "")
+			let expression = msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(/\B(?<!\.\d*)(?<=\d+),(?=(\d{3})+(?!\d))/g, "").replace(/evaluate|parse/, "")
 				.replace(/(?<=\d)[Tt]/g, "000b").replace(/(?<=\d)[Bb]/g, "000m").replace(/(?<=\d)[Mm]/g, "000k").replace(/(?<=\d)[Kk]/g, "000");
 			console.log(`Calculating expression: ${expression}`);
 			let re = math.evaluate(expression, scope);
