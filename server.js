@@ -169,6 +169,7 @@ client.on("message", msg => {
 					const listings = currency_prices[curr];
 					while (n > listings[0].amount) {
 						price += listings[0].amount * listings[0].price;
+						n -= listings[0].amount;
 						listings.shift();
 					}
 					if (n > 0) {
