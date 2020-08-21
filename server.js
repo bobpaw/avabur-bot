@@ -3,6 +3,7 @@ const Secrets = require("./secrets.js");
 const fetch = require("node-fetch");
 
 const Git = require("simple-git")();
+const math = require("mathjs");
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
@@ -147,6 +148,43 @@ client.on("message", msg => {
 	if (msg.content === "!source") {
 		msg.reply("avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot");
 	}
+	if (/^!(?:math|calc(?:ulate)?) /.test(msg.content)) {
+		get_currency_prices().then(currency_prices => {
+			let scope = {
+				units: function (curr, n) {
+					if (!curr in currency_prices) throw new Error("Invalid currency");
+					let price = 0;
+					const listings = currency_prices[curr];
+					while (n > listings[0].amount) {
+						price += listings[0].amount * listings[0].price;
+						listings.shift();
+					}
+					if (n > 0) {
+						price += listings[0].price * n;
+					}
+					return price;
+				},
+				cry: "Crystal",
+				plat: "Platinum",
+				food: "Food",
+				wood: "Wood",
+				iron: "Iron",
+				stone: "Stone",
+				mat: "Crafting Material",
+				frag: "Gem Fragment",
+				c: "Crystal",
+				p: "Platinum",
+				f: "Food",
+				w: "Wood",
+				i: "Iron",
+				s: "Stone",
+				m: "Crafting Material",
+				f: "Gem Fragment"
+			}
+			let re = math.evaluate(msg.content.replace(/^!(?:math|calc(?:ulate)?) /, ""), scope);
+			msg.reply(re);
+        })
+    }
 	if (msg.content === "!version") {
 		getVersion().then(val => {msg.reply(val);});
 	}
