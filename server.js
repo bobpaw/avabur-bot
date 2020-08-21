@@ -185,7 +185,10 @@ client.on("message", msg => {
 				m: "Crafting Material",
 				f: "Gem Fragment"
 			}
-			let re = math.evaluate(msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(",", ""), scope);
+			let expression = msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(",", "");
+			console.log(`Calculating expression: ${expression}`);
+			let re = math.evaluate(expression, scope);
+			console.log(`Expression evaluated to ${re}`);
 			msg.reply(add_commas(re));
         })
     }
