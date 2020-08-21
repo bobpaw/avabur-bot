@@ -211,7 +211,7 @@ client.on("message", msg => {
 		getVersion().then(val => {msg.reply(val);});
 	}
 	if (msg.content === "!help" || msg.content === "!commands") {
-		msg.reply("!luck, !market, !ping, !source, !version, !help, !commands");
+		msg.reply("!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate");
 	}
 });
 
