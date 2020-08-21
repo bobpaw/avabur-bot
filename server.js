@@ -1,8 +1,6 @@
 const Secrets = require("./secrets.js");
-const package_info = require("./package.json");
 
 const https = require("https");
-const fs = require("fs");
 
 const Git = require("simple-git")();
 const Discord = require("discord.js");
