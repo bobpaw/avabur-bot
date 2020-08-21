@@ -203,9 +203,15 @@ client.on("message", msg => {
             }
 			let expression = expand_numeric_literals(msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(/(?<!\.\d*)(?<=\d+),(?=(\d{3})+(?!\d))/g, "").replace(/evaluate|parse/, ""));
 			console.log(`Calculating expression: ${expression}`);
-			let re = math.evaluate(expression, scope);
-			console.log(`Expression evaluated to ${re}`);
-			msg.reply(add_commas(re));
+			let re = "";
+			try {
+				re = add_commas(math.evaluate(expression, scope));
+				console.log(`Expression evaluated to ${re}`);
+			} catch (e) {
+				console.error("math.evaluate error: %s", e.message);
+				re = `Error evaluating ${msg.content} expression \`${msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "")}\` -> \`${expression}\``;
+			}
+			msg.reply(re);
 		});
 	}
 	if (msg.content === "!version") {
