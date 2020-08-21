@@ -4,6 +4,7 @@ const package_info = require("./package.json");
 const https = require("https");
 const fs = require("fs");
 
+const Git = require("simple-git")();
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
@@ -19,6 +20,28 @@ const sql_pool = mysql.createPool({
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 });
+
+async function getVersion () {
+	try {
+		let branch = await Git.branch();
+		let cur_tag = await Git.raw(["describe", "--exact-match", "--tags", "HEAD"]).catch(e => {
+			if (!/fatal: no tag exactly matches/.test(e.message)) throw e;
+		});
+		if (cur_tag && !cur_tag.failed && /v\d\.\d\.\d(?:-[^ ]+)?/.test(cur_tag)) {
+			console.log(`Providing version ${cur_tag}`);
+			return cur_tag;
+		} else if (branch["current"] === "experimental") {
+			let commit_hash = await Git.revparse(["--short", "HEAD"]);
+			console.log(`Providing current commit hash ${commit_hash}`);
+			return commit_hash;
+		} else {
+			console.log(`Providing current branchname ${branch["current"]}`);
+			return branch["current"]
+		}
+	} catch (e) {
+		throw e;
+	}
+}
 
 client.on("message", msg => {
 	if (msg.author.id !== client.user.id) {
@@ -145,7 +168,7 @@ client.on("message", msg => {
 		msg.reply("avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot");
 	}
 	if (msg.content === "!version") {
-		msg.reply(package_info.version);
+		getVersion().then(val => {msg.reply(val);});
 	}
 	if (msg.content === "!help" || msg.content === "!commands") {
 		msg.reply("!luck, !market, !ping, !source, !version, !help, !commands");
