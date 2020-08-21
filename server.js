@@ -1,6 +1,6 @@
 const Secrets = require("./secrets.js");
 
-const https = require("https");
+const fetch = require("node-fetch");
 
 const Git = require("simple-git")();
 const Discord = require("discord.js");
@@ -39,6 +39,15 @@ async function getVersion () {
 	} catch (e) {
 		throw e;
 	}
+}
+
+async function get_currency_prices() {
+	try {
+		let prices = await fetch("https://www.avabur.com/api/market/currency").then(res => res.json());
+		return prices;
+	} catch (e) {
+		throw e;
+    }
 }
 
 client.on("message", msg => {
@@ -122,45 +131,17 @@ client.on("message", msg => {
 				"Do nothing";
 			} // switch(tag)
 		} // for (tag of tags)
-		https.get("https://www.avabur.com/api/market/currency", response => {
-			const {statusCode} = response;
-			const contentType = response.headers["content-type"];
-
-			let error;
-			if (statusCode !== 200) {
-				error = new Error(`Request failed. Status Code: ${statusCode}`);
-			} else if (!/^application\/json/.test(contentType)) {
-				error = new Error(`Invalid content-type. Expected application/json but received ${contentType}`);
+		const currency_prices = get_currency_prices();
+		let reply = ""
+		for (const currency of currencies) {
+			if (currency in currency_prices) {
+				// https://stackoverflow.com/a/2901298/3413725
+				reply += `${currency}: ${currency_prices[currency][0].price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}, `;
+			} else {
+				reply += `Nobody is selling ${currency}, `;
 			}
-			if (error) {
-				console.error(error.message);
-				response.resume();
-				return;
-			}
-
-			response.setEncoding("utf8");
-			let responseText = "";
-			response.on("data", chunk => { responseText += chunk; });
-			response.on("end", function () {
-				try {
-					const currency_prices = JSON.parse(responseText);
-					let reply = ""
-					for (const currency of currencies) {
-						if (currency in currency_prices) {
-							// https://stackoverflow.com/a/2901298/3413725
-							reply += `${currency}: ${currency_prices[currency][0].price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}, `;
-						} else {
-							reply += `Nobody is selling ${currency}, `;
-						}
-					}
-					msg.reply(reply.replace(/, $/, ""));
-				} catch (e) {
-					console.error(e.message);
-				}
-			});
-		}).on("error", (e) => {
-			console.error(`Got error: ${e.message}`);
-		});
+		}
+		msg.reply(reply.replace(/, $/, ""));
 	}
 	if (msg.content === "!source") {
 		msg.reply("avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot");
