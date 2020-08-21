@@ -5,15 +5,13 @@ const fetch = require("node-fetch");
 const Git = require("simple-git")();
 const basic_math = require("mathjs");
 const math = basic_math.create(basic_math.all);
-const evaluate_expression = math.evaluate;
 math.import({
 	'import': function () { throw new Error('Function import is disabled'); },
 	'createUnit': function () { throw new Error('Function createUnit is disabled'); },
-	'evaluate': function () { throw new Error('Function evaluate is disabled'); },
 	'parse': function () { throw new Error('Function parse is disabled'); },
 	'simplify': function () { throw new Error('Function simplify is disabled'); },
 	'derivative': function () { throw new Error('Function derivative is disabled'); }
-}, { override: true })
+}, { override: true });
 
 const Discord = require("discord.js");
 const client = new Discord.Client();
@@ -196,9 +194,10 @@ client.on("message", msg => {
 				cr: "Crafting Material",
 				f: "Gem Fragment"
 			}
-			let expression = msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(",", "").replace(/[Tt]/g, "000b").replace(/[Bb]/g, "000m").replace(/[Mm]/g, "000k").replace(/[Kk]/g, "000");
+			let expression = msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(",", "").replace("evaluate", "")
+				.replace(/(?<=\d)[Tt]/g, "000b").replace(/(?<=\d)[Bb]/g, "000m").replace(/(?<=\d)[Mm]/g, "000k").replace(/(?<=\d)[Kk]/g, "000");
 			console.log(`Calculating expression: ${expression}`);
-			let re = math.evaluate(expression, scope);
+			let re = evaluate_expression(expression, scope);
 			console.log(`Expression evaluated to ${re}`);
 			msg.reply(add_commas(re));
         })
