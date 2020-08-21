@@ -194,10 +194,10 @@ client.on("message", msg => {
 				f: "Gem Fragment"
 			};
 			function expand_numeric_literals(number) {
-				let final_number = number.replace(/\b(\d+(?:\.\d+)?)[Tt])/g, "($1 * 1000000000000)")
-					.replace(/\b(\d+(?:\.\d+)?)[Bb])/g, "($1 * 1000000000)")
-					.replace(/\b(\d+(?:\.\d+)?)[Mm])/g, "($1 * 1000000)")
-					.replace(/\b(\d+(?:\.\d+)?)[Kk])/g, "($1 * 1000)");
+				let final_number = number.replace(/\b(\d+(?:\.\d+)?)[Tt]/g, "($1 * 1000000000000)")
+					.replace(/\b(\d+(?:\.\d+)?)[Bb]/g, "($1 * 1000000000)")
+					.replace(/\b(\d+(?:\.\d+)?)[Mm]/g, "($1 * 1000000)")
+					.replace(/\b(\d+(?:\.\d+)?)[Kk]/g, "($1 * 1000)");
 				return final_number;
             }
 			let expression = expand_numeric_literals(msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(/(?<!\.\d*)(?<=\d+),(?=(\d{3})+(?!\d))/g, "").replace(/evaluate|parse/, ""));
