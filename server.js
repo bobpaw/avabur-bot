@@ -1,4 +1,5 @@
 const Secrets = require("./secrets.js");
+const package_info = require("./package.json");
 
 const https = require("https");
 const fs = require("fs");
@@ -142,6 +143,12 @@ client.on("message", msg => {
 	}
 	if (msg.content === "!source") {
 		msg.reply("avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot");
+	}
+	if (msg.content === "!version") {
+		msg.reply(package_info.version);
+	}
+	if (msg.content === "!help" || msg.content === "!commands") {
+		msg.reply("!luck, !market, !ping, !source, !version, !help, !commands");
 	}
 });
 
