@@ -6,10 +6,10 @@ const Git = require("simple-git")();
 const basic_math = require("mathjs");
 const math = basic_math.create(basic_math.all);
 math.import({
-	'import': function () { throw new Error('Function import is disabled'); },
-	'createUnit': function () { throw new Error('Function createUnit is disabled'); },
-	'simplify': function () { throw new Error('Function simplify is disabled'); },
-	'derivative': function () { throw new Error('Function derivative is disabled'); }
+	"import": function () { throw new Error("Function import is disabled"); },
+	"createUnit": function () { throw new Error("Function createUnit is disabled"); },
+	"simplify": function () { throw new Error("Function simplify is disabled"); },
+	"derivative": function () { throw new Error("Function derivative is disabled"); }
 }, { override: true });
 
 const Discord = require("discord.js");
@@ -74,7 +74,7 @@ async function handle_message (msg) {
 		return;
 	}
 	if (/^![a-zA-Z]+/.test(msg.content)) {
-	switch (msg.content.match(/^![a-zA-Z]+/)[0]) {
+		switch (msg.content.match(/^![a-zA-Z]+/)[0]) {
 		case "!ping":
 			return "pong";
 			break;
@@ -98,37 +98,37 @@ async function handle_message (msg) {
 			for (const tag of tags) {
 				if (tag === "!market") continue;
 				switch (tag.toLowerCase()) {
-					case "crystals": case "crystal": case "cry": case "c":
-						currencies.push("Crystal");
-						break;
-					case "platinum": case "plats": case "plat": case "p":
-						currencies.push("Platinum");
-						break;
-					case "food": case "f":
-						currencies.push("Food");
-						break;
-					case "wood": case "w":
-						currencies.push("Wood");
-						break;
-					case "stone": case "s":
-						currencies.push("Stone");
-						break;
-					case "iron": case "i":
-						currencies.push("Iron");
-						break;
-					case "crafting_materials": case "crafting": case "materials": case "mats": case "m":
-						currencies.push("Crafting Material");
-						break;
-					case "gem_fragments": case "gem": case "gems": case "frags": case "frag": case "f": case "g":
-						currencies.push("Gem Fragment");
-						break;
-					default:
-						// Gives a slightly better error
-						currencies.push(tag);
+				case "crystals": case "crystal": case "cry": case "c":
+					currencies.push("Crystal");
+					break;
+				case "platinum": case "plats": case "plat": case "p":
+					currencies.push("Platinum");
+					break;
+				case "food": case "f":
+					currencies.push("Food");
+					break;
+				case "wood": case "w":
+					currencies.push("Wood");
+					break;
+				case "stone": case "s":
+					currencies.push("Stone");
+					break;
+				case "iron": case "i":
+					currencies.push("Iron");
+					break;
+				case "crafting_materials": case "crafting": case "materials": case "mats": case "m":
+					currencies.push("Crafting Material");
+					break;
+				case "gem_fragments": case "gem": case "gems": case "frags": case "frag": case "f": case "g":
+					currencies.push("Gem Fragment");
+					break;
+				default:
+					// Gives a slightly better error
+					currencies.push(tag);
 				} // switch(tag)
 			} // for (tag of tags)
 			try {
-			const currency_prices = await get_currency_prices();
+				const currency_prices = await get_currency_prices();
 				let reply = "";
 				for (const currency of currencies) {
 					if (currency in currency_prices) {
@@ -191,7 +191,7 @@ async function handle_message (msg) {
 				return re;
 			} catch (e) {
 				console.error("Error getting currency values: %s", e);
-				return "Error getting currency values;"
+				return "Error getting currency values;";
 			}
 			break;
 		case "!version":
@@ -205,11 +205,11 @@ async function handle_message (msg) {
 			break;
 		case "!help": case "!commands": default:
 			return "!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate";
-	}
+		}
 	}
 }
 
-const command_messages = {}
+const command_messages = {};
 
 client.on("message", async (msg) => {
 	if (msg.author.id === client.user.id) return; // Don't process own messages
@@ -228,7 +228,7 @@ client.on("messageUpdate", async (old, new_msg) => {
 	if (new_msg.author.id === client.user.id) return;
 	if (old.id in command_messages) {
 		command_messages[new_msg.id] = await command_messages[old.id].edit(
-		`<@${command_messages[old.id].mentions.users.first().id}>, ` + await handle_message(new_msg));
+			`<@${command_messages[old.id].mentions.users.first().id}>, ` + await handle_message(new_msg));
 	} else {
 		command_messages[new_msg.id] = await new_msg.reply(await handle_message(new_msg));
 	}

@@ -28,6 +28,7 @@
     "simple-git": "^2.19.0"
   },
   "devDependencies": {
+    "eslint": "^7.7.0",
     "nodemon": "^2.0.4"
   }
 }
