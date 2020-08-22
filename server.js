@@ -64,7 +64,7 @@ function add_commas (number) {
 	return number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 }
 
-function handle_message (msg) {
+async function handle_message (msg) {
 	if (msg.content === "Everyone An event is starting soon!" && msg.author.bot) {
 		console.log("Received Event starting message");
 		sql_pool.query("insert into events (time) values (current_timestamp())", function (err, _unused) {
@@ -75,7 +75,7 @@ function handle_message (msg) {
 	}
 	switch (msg.content.match(/^![a-zA-z]+/)[0]) {
 		case "!ping":
-			msg.reply("pong");
+			return "pong";
 			break;
 		case "!luck":
 			console.log("Calculating current luck.");
@@ -86,7 +86,7 @@ function handle_message (msg) {
 				changes.shift();
 				let avg = changes.reduce((total, x) => total + x, 0) / changes.length;
 				let time_since_last = Date.now() / 1000 - result[result.length - 1];
-				msg.reply(`Event luck is at ${(time_since_last / avg * 100).toFixed(2)}%.`);
+				return `Event luck is at ${(time_since_last / avg * 100).toFixed(2)}%.`;
 			});
 			break;
 		case "!market":
@@ -126,7 +126,8 @@ function handle_message (msg) {
 						currencies.push(tag);
 				} // switch(tag)
 			} // for (tag of tags)
-			get_currency_prices().then(currency_prices => {
+			try {
+			const currency_prices = await get_currency_prices();
 				let reply = "";
 				for (const currency of currencies) {
 					if (currency in currency_prices) {
@@ -135,17 +136,18 @@ function handle_message (msg) {
 						reply += `Nobody is selling ${currency}, `;
 					}
 				}
-				msg.reply(reply.replace(/, $/, ""));
-			}).catch(e => {
+				return reply.replace(/, $/, "");
+			} catch(e) {
 				console.log("Error getting currency prices: %s", e.message);
-				msg.reply("Error getting currency prices.");
-			});
+				return "Error getting currency prices.";
+			}
 			break;
 		case "!source":
-			msg.reply("avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot");
+			return "avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot";
 			break;
 		case "!math": case "!calc": case "!calculate":
-			get_currency_prices().then(currency_prices => {
+			try {
+				currency_prices = await get_currency_prices();
 				let scope = {
 					units: function (curr, n) {
 						if (!curr in currency_prices) throw new Error("Invalid currency");
@@ -179,30 +181,46 @@ function handle_message (msg) {
 				console.log(`Calculating expression: ${expression}`);
 				let re = "";
 				try {
-					re = add_commas(math.evaluate(expression, scope));
+					re = add_commas(await math.evaluate(expression, scope));
 					console.log(`Expression evaluated to ${re}`);
 				} catch (e) {
 					console.error("math.evaluate error: %s", e.message);
 					re = `Error evaluating ${msg.content} expression \`${msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "")}\` -> \`${expression}\``;
 				}
-				msg.reply(re);
-			});
+				return re;
+			} catch (e) {
+				console.error("Error getting currency values: %s", e);
+				return "Error getting currency values;"
+			}
 			break;
 		case "!version":
-			getVersion().then(val => { msg.reply(val); }).catch(e => {
+			try {
+				let val = await getVersion();
+				return getVersion();
+			} catch (e) {
 				console.log("Error getting version: %s", e.message);
-				msg.reply(`Error getting reply.`);
-			});
+				return "Error getting version.";
+			}
 			break;
 		case "!help": case "!commands": default:
-			msg.reply("!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate");
+			return "!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate";
 	}
 }
 
-client.on("message", msg => {
+const command_messages = {}
+
+client.on("message", async (msg) => {
 	if (msg.author.id === client.user.id) return; // Don't process own messages
 	console.log(`${msg.author.tag} (${msg.author.username}) - ${msg.author.id}`);
-	handle_message(msg);
+	let my_msg = await msg.reply(handle_message(msg));
+	command_messages[msg.id] = my_msg;
+});
+
+msg.on("messageUpdate", async (old, new_msg) => {
+	if (new_msg.author.id === client.user.id) return;
+	if (old.id in command_messages) {
+		command_messages[new_msg.id] = await command_messages[old.id].edit(handle_message(new_msg));
+	}
 });
 
 client.login(Secrets.bot_token);
