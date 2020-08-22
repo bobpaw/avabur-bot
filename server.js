@@ -65,9 +65,6 @@ function add_commas (number) {
 }
 
 function handle_message (msg) {
-    if (msg.author.id !== client.user.id) {
-        console.log(`${msg.author.tag} (${msg.author.username}) - ${msg.author.id}`);
-    }
     if (msg.content === "Everyone An event is starting soon!" && msg.author.bot) {
         console.log("Received Event starting message");
         sql_pool.query("insert into events (time) values (current_timestamp())", function (err, _unused) {
@@ -98,6 +95,7 @@ function handle_message (msg) {
             let currencies = [];
             let ingredients = [];
             for (const tag of tags) {
+            		if (tag === "!market") continue;
                 switch (tag.toLowerCase()) {
                     case "crystals": case "crystal": case "cry": case "c":
                         currencies.push("Crystal");
@@ -124,7 +122,8 @@ function handle_message (msg) {
                         currencies.push("Gem Fragment");
                         break;
                     default:
-                        "Do nothing";
+                    		// Gives a slightly better error
+                        currencies.push(tag);
                 } // switch(tag)
             } // for (tag of tags)
             get_currency_prices().then(currency_prices => {
@@ -201,6 +200,8 @@ function handle_message (msg) {
 }
 
 client.on("message", msg => {
+    if (msg.author.id === client.user.id) return; // Don't process own messages
+    console.log(`${msg.author.tag} (${msg.author.username}) - ${msg.author.id}`);
     handle_message(msg);
 });
 
