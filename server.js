@@ -138,6 +138,9 @@ function handle_message (msg) {
                     }
                 }
                 msg.reply(reply.replace(/, $/, ""));
+            }).catch(e => {
+                console.log("Error getting currency prices: %s", e.message);
+                msg.reply("Error getting currency prices.");
             });
             break;
         case "!source":
@@ -188,7 +191,10 @@ function handle_message (msg) {
             });
             break;
         case "!version":
-            getVersion().then(val => { msg.reply(val); });
+            getVersion().then(val => { msg.reply(val); }).catch(e => {
+                console.log("Error getting version: %s", e.message);
+                msg.reply(`Error getting reply.`);
+            });
             break;
         case "!help": case "!commands": default:
             msg.reply("!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate");
