@@ -1,3 +1,4 @@
+"use strict";
 const Secrets = require("./secrets.js");
 
 const fetch = require("node-fetch");
