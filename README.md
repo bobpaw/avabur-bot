@@ -1,4 +1,6 @@
 # avabur-bot
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fbobpaw%2Favabur-bot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fbobpaw%2Favabur-bot?ref=badge_shield)
+
 
 Requires a mysql database setup with:
  - avabur.events (time (timestamp))
@@ -24,3 +26,7 @@ Gathers event data if you have a [Notifications of Avabur](https://github.com/da
    - Includes `units(c,n)` function that calculates the price of `n`-units of `c` currency (of the 10 supported by [roa-apis](https://github.com/edvordo/roa-apis/blob/master/market-currency.md)). Each of them have shortened variables and single character shortcuts.
  * `!version` Responds with the release tag (if there is one), commit hash (if the branch is experimental), or branch name
  * `!help`, `!commands` Replies with a list of commands
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fbobpaw%2Favabur-bot.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fbobpaw%2Favabur-bot?ref=badge_large)
