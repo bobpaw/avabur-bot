@@ -73,7 +73,8 @@ async function handle_message (msg) {
 		});
 		return;
 	}
-	switch (msg.content.match(/^![a-zA-z]+/)[0]) {
+	if (/^![a-zA-Z]+/.test(msg.content)) {
+	switch (msg.content.match(/^![a-zA-Z]+/)[0]) {
 		case "!ping":
 			return "pong";
 			break;
@@ -205,6 +206,7 @@ async function handle_message (msg) {
 		case "!help": case "!commands": default:
 			return "!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate";
 	}
+	}
 }
 
 const command_messages = {}
@@ -212,14 +214,23 @@ const command_messages = {}
 client.on("message", async (msg) => {
 	if (msg.author.id === client.user.id) return; // Don't process own messages
 	console.log(`${msg.author.tag} (${msg.author.username}) - ${msg.author.id}`);
-	let my_msg = await msg.reply(handle_message(msg));
-	command_messages[msg.id] = my_msg;
+	let reply_text = await handle_message(msg);
+	if (reply_text) {
+		try {
+			command_messages[msg.id] = await msg.reply(reply_text);
+		} catch (e) {
+			console.error("Error replying to message: %s", e.message);
+		}
+	}
 });
 
 client.on("messageUpdate", async (old, new_msg) => {
 	if (new_msg.author.id === client.user.id) return;
 	if (old.id in command_messages) {
-		command_messages[new_msg.id] = await command_messages[old.id].edit(handle_message(new_msg));
+		command_messages[new_msg.id] = await command_messages[old.id].edit(
+		`<@${command_messages[old.id].mentions.users.first().id}>, ` + await handle_message(new_msg));
+	} else {
+		command_messages[new_msg.id] = await new_msg.reply(await handle_message(new_msg));
 	}
 });
 
