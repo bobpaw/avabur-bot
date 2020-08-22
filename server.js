@@ -1,6 +1,8 @@
 "use strict";
 const Secrets = require("./secrets.js");
 
+const {promisify} = require("util");
+
 const fetch = require("node-fetch");
 
 const basic_math = require("mathjs");
@@ -23,8 +25,10 @@ const sql_pool = mysql.createPool({
 	password: Secrets.sql_pass,
 	database: "avabur"
 });
+sql_pool.query = promisify(sql_pool.query);
 
 const getVersion = require("lib/get-version.js");
+
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 });
@@ -54,16 +58,18 @@ async function handle_message (msg) {
 			return "pong";
 		case "!luck":
 			console.log("Calculating current luck.");
-			sql_pool.query("select unix_timestamp(time) from events;", function (err, result) {
-				if (err) throw err;
+			try {
+				let result = await sql_pool.query("select unix_timestamp(time) from events;");
 				result = result.map(x => x["unix_timestamp(time)"]);
 				let changes = result.map((x, i, a) => (i > 0 ? x - a[i - 1] : 0));
 				changes.shift();
 				let avg = changes.reduce((total, x) => total + x, 0) / changes.length;
 				let time_since_last = Date.now() / 1000 - result[result.length - 1];
 				return `Event luck is at ${(time_since_last / avg * 100).toFixed(2)}%.`;
-			});
-			break;
+			} catch (e) {
+				console.error(e.message);
+				return "Error calculating luck";
+			}
 		case "!market": {
 			console.log("Getting market currency values.");
 			let tags = msg.content.split(" ");
