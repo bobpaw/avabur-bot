@@ -216,7 +216,7 @@ client.on("message", async (msg) => {
 	command_messages[msg.id] = my_msg;
 });
 
-msg.on("messageUpdate", async (old, new_msg) => {
+client.on("messageUpdate", async (old, new_msg) => {
 	if (new_msg.author.id === client.user.id) return;
 	if (old.id in command_messages) {
 		command_messages[new_msg.id] = await command_messages[old.id].edit(handle_message(new_msg));
