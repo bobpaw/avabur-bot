@@ -15,4 +15,5 @@ jobs:
         - fossa init
         - fossa analyze
       after_success:
-        - fossa test
+      # Set push-only key if regular one is unavailable (i.e. this is a pull-request from a fork).
+        - FOSSA_API_KEY="${FOSSA_API_KEY=-78908c4dfc682bcd6fbe2bd38816359c}" fossa test
