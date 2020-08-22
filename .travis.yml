@@ -8,11 +8,11 @@ node_js:
 jobs:
   include:
     - stage: "FOSSA"
-    node_js: node
-    before_script:
-      - "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | sudo bash"
-    script:
-      - fossa init
-      - fossa analyze
-    after_success:
-      - fossa test
+      node_js: node
+      before_script:
+        - "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | sudo bash"
+      script:
+        - fossa init
+        - fossa analyze
+      after_success:
+        - fossa test

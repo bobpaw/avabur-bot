@@ -1,3 +1,12 @@
 #!/bin/sh
 
 npx eslint --cache --cache-location .eslintcache_pre-commit .
+
+if git status -s | grep -qF '.travis.yml'; then
+	if which travis > /dev/null; then
+		travis lint
+	else
+		echo "Install gem 'travis'"
+		exit 1
+	fi
+fi
