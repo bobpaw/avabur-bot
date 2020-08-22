@@ -6,7 +6,7 @@ const getVersion = require("../lib/get-version.js");
 describe("getVersion()", function () {
 	it("should return a semver or a commit hash", async function () {
 		expect(await getVersion()).to.satisfy(function (str) {
-			return valid(str) !== null || /[0-9a-f]{7}/.test(str);
+			return valid(str) !== null || /^[0-9a-f]{7} \(branch: (?!-)(?!.+(?:\.\.|@{).+)[^ ~^:?*[]+(?<!\.)\)$/.test(str);
 		});
 	});
 });
