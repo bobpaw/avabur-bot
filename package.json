@@ -4,7 +4,7 @@
   "description": "Provides functions to work in concert with a Notifications of Avabur webhook. !luck requires mysql, !market gets currency values, !ping replies pong",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "eslint --cache --cache-location .eslintcache_npm-test . && mocha"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/bobpaw/avabur-bot#readme",
   "dependencies": {
+    "assert": "^2.0.0",
     "discord.js": "^12.3.1",
     "mathjs": "^7.1.0",
     "mysql": "^2.18.1",
@@ -28,6 +29,7 @@
     "simple-git": "^2.19.0"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "eslint": "^7.7.0",
     "mocha": "^8.1.1",
     "nodemon": "^2.0.4"
