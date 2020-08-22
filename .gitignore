@@ -106,8 +106,11 @@ dist
 # Backup file
 *~
 
-# Secrets file
-secrets.js
-
 # VisualStudio
 .vs/
+
+# ESLint cache
+.eslintcache*
+
+# Secrets file
+secrets.js
