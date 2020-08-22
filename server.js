@@ -68,16 +68,15 @@ function handle_message (msg) {
     if (msg.author.id !== client.user.id) {
         console.log(`${msg.author.tag} (${msg.author.username}) - ${msg.author.id}`);
     }
+    if (msg.content === "Everyone An event is starting soon!" && msg.author.bot) {
+        console.log("Received Event starting message");
+        sql_pool.query("insert into events (time) values (current_timestamp())", function (err, _unused) {
+            if (err) throw err;
+            console.log("Logged current time in events table");
+        });
+        return;
+    }
     switch (msg.content.match(/^![a-zA-z]+/)[0]) {
-        case null:
-            if (msg.content === "Everyone An event is starting soon!" && msg.author.bot) {
-                console.log("Received Event starting message");
-                sql_pool.query("insert into events (time) values (current_timestamp())", function (err, _unused) {
-                    if (err) throw err;
-                    console.log("Logged current time in events table");
-                });
-            }
-            break;
         case "!ping":
             msg.reply("pong");
             break;
