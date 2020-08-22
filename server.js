@@ -27,7 +27,7 @@ const sql_pool = mysql.createPool({
 });
 sql_pool.query = promisify(sql_pool.query);
 
-const getVersion = require("lib/get-version.js");
+const getVersion = require("./lib/get-version.js");
 
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
