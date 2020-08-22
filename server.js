@@ -29,34 +29,26 @@ client.on("ready", () => {
 });
 
 async function getVersion () {
-	try {
-		let branch = await Git.branch();
-		let cur_tag = await Git.raw(["describe", "--exact-match", "--tags", "HEAD"]).catch(e => {
-			if (!/fatal: no tag exactly matches/.test(e.message)) throw e;
-		});
-		if (cur_tag && !cur_tag.failed && /v\d\.\d\.\d(?:-[^ ]+)?/.test(cur_tag)) {
-			console.log(`Providing version ${cur_tag}`);
-			return cur_tag;
-		} else if (branch["current"] === "experimental") {
-			let commit_hash = await Git.revparse(["--short", "HEAD"]);
-			console.log(`Providing current commit hash ${commit_hash}`);
-			return commit_hash;
-		} else {
-			console.log(`Providing current branchname ${branch["current"]}`);
-			return branch["current"];
-		}
-	} catch (e) {
-		throw e;
+	let branch = await Git.branch();
+	let cur_tag = await Git.raw(["describe", "--exact-match", "--tags", "HEAD"]).catch(e => {
+		if (!/fatal: no tag exactly matches/.test(e.message)) throw e;
+	});
+	if (cur_tag && !cur_tag.failed && /v\d\.\d\.\d(?:-[^ ]+)?/.test(cur_tag)) {
+		console.log(`Providing version ${cur_tag}`);
+		return cur_tag;
+	} else if (branch["current"] === "experimental") {
+		let commit_hash = await Git.revparse(["--short", "HEAD"]);
+		console.log(`Providing current commit hash ${commit_hash}`);
+		return commit_hash;
+	} else {
+		console.log(`Providing current branchname ${branch["current"]}`);
+		return branch["current"];
 	}
 }
 
 async function get_currency_prices () {
-	try {
-		let prices = await fetch("https://www.avabur.com/api/market/currency").then(res => res.json());
-		return prices;
-	} catch (e) {
-		throw e;
-	}
+	let prices = await fetch("https://www.avabur.com/api/market/currency").then(res => res.json());
+	return prices;
 }
 
 function add_commas (number) {
@@ -67,7 +59,7 @@ function add_commas (number) {
 async function handle_message (msg) {
 	if (msg.content === "Everyone An event is starting soon!" && msg.author.bot) {
 		console.log("Received Event starting message");
-		sql_pool.query("insert into events (time) values (current_timestamp())", function (err, _unused) {
+		sql_pool.query("insert into events (time) values (current_timestamp())", function (err) {
 			if (err) throw err;
 			console.log("Logged current time in events table");
 		});
@@ -77,7 +69,6 @@ async function handle_message (msg) {
 		switch (msg.content.match(/^![a-zA-Z]+/)[0]) {
 		case "!ping":
 			return "pong";
-			break;
 		case "!luck":
 			console.log("Calculating current luck.");
 			sql_pool.query("select unix_timestamp(time) from events;", function (err, result) {
@@ -90,11 +81,11 @@ async function handle_message (msg) {
 				return `Event luck is at ${(time_since_last / avg * 100).toFixed(2)}%.`;
 			});
 			break;
-		case "!market":
+		case "!market": {
 			console.log("Getting market currency values.");
 			let tags = msg.content.split(" ");
 			let currencies = [];
-			let ingredients = [];
+			// let ingredients = [];
 			for (const tag of tags) {
 				if (tag === "!market") continue;
 				switch (tag.toLowerCase()) {
@@ -119,7 +110,7 @@ async function handle_message (msg) {
 				case "crafting_materials": case "crafting": case "materials": case "mats": case "m":
 					currencies.push("Crafting Material");
 					break;
-				case "gem_fragments": case "gem": case "gems": case "frags": case "frag": case "f": case "g":
+				case "gem_fragments": case "gem": case "gems": case "frags": case "frag": case "g":
 					currencies.push("Gem Fragment");
 					break;
 				default:
@@ -142,16 +133,15 @@ async function handle_message (msg) {
 				console.log("Error getting currency prices: %s", e.message);
 				return "Error getting currency prices.";
 			}
-			break;
+		} // case "!market"
 		case "!source":
 			return "avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot";
-			break;
 		case "!math": case "!calc": case "!calculate":
 			try {
-				currency_prices = await get_currency_prices();
+				let currency_prices = await get_currency_prices();
 				let scope = {
 					units: function (curr, n) {
-						if (!curr in currency_prices) throw new Error("Invalid currency");
+						if (!(curr in currency_prices)) throw new Error("Invalid currency");
 						let price = 0;
 						const listings = currency_prices[curr];
 						while (n > listings[0].amount) {
@@ -169,15 +159,15 @@ async function handle_message (msg) {
 					mat: "Crafting Material", frag: "Gem Fragment",
 					c: "Crystal", p: "Platinum", f: "Food", w: "Wood",
 					i: "Iron", s: "Stone", cr: "Crafting Material",
-					f: "Gem Fragment"
+					g: "Gem Fragment"
 				};
-				function expand_numeric_literals (number) {
+				let expand_numeric_literals = function (number) {
 					let final_number = number.replace(/\b(\d+(?:\.\d+)?)[Tt]/g, "($1 * 1000000000000)")
 						.replace(/\b(\d+(?:\.\d+)?)[Bb]/g, "($1 * 1000000000)")
 						.replace(/\b(\d+(?:\.\d+)?)[Mm]/g, "($1 * 1000000)")
 						.replace(/\b(\d+(?:\.\d+)?)[Kk]/g, "($1 * 1000)");
 					return final_number;
-				}
+				};
 				let expression = expand_numeric_literals(msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(/(?<!\.\d*)(?<=\d+),(?=(\d{3})+(?!\d))/g, "").replace(/evaluate|parse/, ""));
 				console.log(`Calculating expression: ${expression}`);
 				let re = "";
@@ -193,16 +183,14 @@ async function handle_message (msg) {
 				console.error("Error getting currency values: %s", e);
 				return "Error getting currency values;";
 			}
-			break;
 		case "!version":
 			try {
 				let val = await getVersion();
-				return getVersion();
+				return val;
 			} catch (e) {
 				console.log("Error getting version: %s", e.message);
 				return "Error getting version.";
 			}
-			break;
 		case "!help": case "!commands": default:
 			return "!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate";
 		}
