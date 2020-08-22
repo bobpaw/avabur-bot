@@ -10,5 +10,5 @@ before_script:
  
 script:
  - fossa init
- - fossa anaylze
+ - fossa analyze
  - npm test
