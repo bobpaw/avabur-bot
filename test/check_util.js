@@ -10,7 +10,7 @@ describe("util.js", function () {
 		});
 		it("should add commas to longer integers", function () {
 			expect(add_commas(1234567)).equals("1,234,567");
-		})
+		});
 		it("should add commas to front of float", function () {
 			expect(add_commas(1234.5)).equals("1,234.5");
 		});
@@ -48,7 +48,7 @@ describe("util.js", function () {
 		});
 		it("should not remove commas from nothing", function () {
 			expect(remove_commas("")).equals("");
-		})
+		});
 		it("should not remove commas from text", function () {
 			expect(remove_commas("foo,bar")).equals("foo,bar");
 		});
