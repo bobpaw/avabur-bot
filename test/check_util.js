@@ -95,6 +95,9 @@ describe("util.js", function () {
 		});
 		it("should expand float million", function () {
 			expect(expand_numeric_literals("3.141m")).to.equal("(3.141 * 1000000)");
-		}
+		});
+		it("should expand in function", function () {
+			expect(expand_numeric_literals("sqrt(3m);")).to.equal("sqrt((3 * 1000000));");
+		});
 	});
 });
