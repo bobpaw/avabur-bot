@@ -3,8 +3,6 @@ const Secrets = require("./secrets.js");
 
 const {promisify} = require("util");
 
-const fetch = require("node-fetch");
-
 const basic_math = require("mathjs");
 const math = basic_math.create(basic_math.all);
 math.import({
@@ -28,15 +26,11 @@ const sql_pool = mysql.createPool({
 sql_pool.query = promisify(sql_pool.query);
 
 const getVersion = require("./lib/get-version.js");
+const get_currency_prices = require(".lib/get-currency-prices.js");
 
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 });
-
-async function get_currency_prices () {
-	let prices = await fetch("https://www.avabur.com/api/market/currency").then(res => res.json());
-	return prices;
-}
 
 function add_commas (number) {
 	// https://stackoverflow.com/a/2901298/3413725
