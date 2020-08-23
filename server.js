@@ -26,7 +26,8 @@ const sql_pool = mysql.createPool({
 sql_pool.query = promisify(sql_pool.query);
 
 const getVersion = require("./lib/get-version.js");
-const get_currency_prices = require(".lib/get-currency-prices.js");
+const get_currency_prices = require("./lib/get-currency-prices.js");
+const handle_market = require("./lib/commands/market.js");
 
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -46,82 +47,50 @@ async function handle_message (msg) {
 		});
 		return;
 	}
+	let reply = "I'm not sure what you want.";
 	if (/^![a-zA-Z]+/.test(msg.content)) {
 		switch (msg.content.match(/^![a-zA-Z]+/)[0]) {
-		case "!ping":
-			return "pong";
-		case "!luck":
-			console.log("Calculating current luck.");
-			try {
-				let result = await sql_pool.query("select unix_timestamp(time) from events;");
-				result = result.map(x => x["unix_timestamp(time)"]);
-				let changes = result.map((x, i, a) => (i > 0 ? x - a[i - 1] : 0));
-				changes.shift();
-				let avg = changes.reduce((total, x) => total + x, 0) / changes.length;
-				let time_since_last = Date.now() / 1000 - result[result.length - 1];
-				return `Event luck is at ${(time_since_last / avg * 100).toFixed(2)}%.`;
-			} catch (e) {
-				console.error(e.message);
-				return "Error calculating luck";
-			}
-		case "!market": {
-			console.log("Getting market currency values.");
-			let tags = msg.content.split(" ");
-			let currencies = [];
-			// let ingredients = [];
-			for (const tag of tags) {
-				if (tag === "!market") continue;
-				switch (tag.toLowerCase()) {
-				case "crystals": case "crystal": case "cry": case "c":
-					currencies.push("Crystal");
-					break;
-				case "platinum": case "plats": case "plat": case "p":
-					currencies.push("Platinum");
-					break;
-				case "food": case "f":
-					currencies.push("Food");
-					break;
-				case "wood": case "w":
-					currencies.push("Wood");
-					break;
-				case "stone": case "s":
-					currencies.push("Stone");
-					break;
-				case "iron": case "i":
-					currencies.push("Iron");
-					break;
-				case "crafting_materials": case "crafting": case "materials": case "mats": case "m":
-					currencies.push("Crafting Material");
-					break;
-				case "gem_fragments": case "gem": case "gems": case "frags": case "frag": case "g":
-					currencies.push("Gem Fragment");
-					break;
-				default:
-					// Gives a slightly better error
-					currencies.push(tag);
-				} // switch(tag)
-			} // for (tag of tags)
-			try {
-				const currency_prices = await get_currency_prices();
-				let reply = "";
-				for (const currency of currencies) {
-					if (currency in currency_prices) {
-						reply += `${currency}: ${add_commas(currency_prices[currency][0].price)}, `;
-					} else {
-						reply += `Nobody is selling ${currency}, `;
-					}
+			case "!ping":
+				reply = "pong";
+				break;
+			case "!luck":
+				console.log("Calculating current luck.");
+				try {
+					let result = await sql_pool.query("select unix_timestamp(time) from events;");
+					result = result.map(x => x["unix_timestamp(time)"]);
+					let changes = result.map((x, i, a) => (i > 0 ? x - a[i - 1] : 0));
+					changes.shift();
+					let avg = changes.reduce((total, x) => total + x, 0) / changes.length;
+					let time_since_last = Date.now() / 1000 - result[result.length - 1];
+					reply = `Event luck is at ${(time_since_last / avg * 100).toFixed(2)}%.`;
+				} catch (e) {
+					console.error(e.message);
+					reply = "Error calculating luck";
 				}
-				return reply.replace(/, $/, "");
-			} catch(e) {
-				console.log("Error getting currency prices: %s", e.message);
-				return "Error getting currency prices.";
-			}
-		} // case "!market"
-		case "!source":
-			return "avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot";
-		case "!math": case "!calc": case "!calculate":
-			try {
-				let currency_prices = await get_currency_prices();
+				break;
+			case "!market":
+				console.log("Getting market currency values.");
+				reply = await handle_market(msg.content.replace(/^!market ?/, ""));
+				break;
+			case "!source":
+				reply = "avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot";
+				break;
+			case "!math": case "!calc": case "!calculate":
+				try {
+					let currency_prices = await get_currency_prices();
+				} catch (e) {
+					if (e.name === "AbortError") {
+						console.log("Fetch aborted while trying to get currency prices");
+						reply = "Fetch aborted while trying to get currency prices";
+					} else if (e.name === "FetchError") {
+						console.log("Error getting currency prices: %s", e.message);
+						reply = "Error fetching currency prices.";
+					} else {
+						// Yikes, not sure what this is.
+						throw e;
+					}
+					break;
+				}
 				let scope = {
 					units: function (curr, n) {
 						if (!(curr in currency_prices)) throw new Error("Invalid currency");
@@ -153,31 +122,27 @@ async function handle_message (msg) {
 				};
 				let expression = expand_numeric_literals(msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(/(?<!\.\d*)(?<=\d+),(?=(\d{3})+(?!\d))/g, "").replace(/evaluate|parse/, ""));
 				console.log(`Calculating expression: ${expression}`);
-				let re = "";
 				try {
-					re = add_commas(await math.evaluate(expression, scope));
-					console.log(`Expression evaluated to ${re}`);
+					reply = add_commas(await math.evaluate(expression, scope));
+					console.log(`Expression evaluated to ${reply}`);
 				} catch (e) {
 					console.error("math.evaluate error: %s", e.message);
-					re = `Error evaluating ${msg.content} expression \`${msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "")}\` -> \`${expression}\``;
+					reply = `Error evaluating ${msg.content} expression \`${msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "")}\` -> \`${expression}\``;
 				}
-				return re;
-			} catch (e) {
-				console.error("Error getting currency values: %s", e);
-				return "Error getting currency values;";
-			}
-		case "!version":
-			try {
-				let val = await getVersion();
-				return val;
-			} catch (e) {
-				console.log("Error getting version: %s", e.message);
-				return "Error getting version.";
-			}
+				break;
+			case "!version":
+				try {
+					reply = await getVersion();
+				} catch (e) {
+					console.log("Error getting version: %s", e.message);
+					reply = "Error getting version.";
+				}
+				break;
 		case "!help": case "!commands": default:
-			return "!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate";
+			reply = "!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate";
 		}
 	}
+	return reply;
 }
 
 const command_messages = {};
