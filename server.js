@@ -28,12 +28,11 @@ sql_pool.query = promisify(sql_pool.query);
 const getVersion = require("./lib/get-version.js");
 const get_currency_prices = require("./lib/get-currency-prices.js");
 const handle_market = require("./lib/commands/market.js");
-const {add_commas, remove_commas} = require("./lib/util.js");
+const {add_commas, remove_commas, expand_numeric_literals} = require("./lib/util.js");
 
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 });
-
 
 async function handle_message (msg) {
 	if (msg.content === "Everyone An event is starting soon!" && msg.author.bot) {
@@ -96,13 +95,6 @@ async function handle_message (msg) {
 					c: "Crystal", p: "Platinum", f: "Food", w: "Wood",
 					i: "Iron", s: "Stone", cr: "Crafting Material",
 					g: "Gem Fragment"
-				};
-				let expand_numeric_literals = function (number) {
-					let final_number = number.replace(/\b(\d+(?:\.\d+)?)[Tt]/g, "($1 * 1000000000000)")
-						.replace(/\b(\d+(?:\.\d+)?)[Bb]/g, "($1 * 1000000000)")
-						.replace(/\b(\d+(?:\.\d+)?)[Mm]/g, "($1 * 1000000)")
-						.replace(/\b(\d+(?:\.\d+)?)[Kk]/g, "($1 * 1000)");
-					return final_number;
 				};
 				let expression = remove_commas(expand_numeric_literals(msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "")).replace(/evaluate|parse/, ""));
 				console.log(`Calculating expression: ${expression}`);
