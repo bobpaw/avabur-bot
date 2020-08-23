@@ -1,7 +1,7 @@
 const { describe, it } = require("mocha");
 const { expect } = require("chai");
 
-const { add_commas, remove_commas } = require("../lib/util.js");
+const { add_commas, remove_commas, expand_numeric_literals } = require("../lib/util.js");
 
 describe("util.js", function () {
 	// add_commas from "util.js"
@@ -67,5 +67,34 @@ describe("util.js", function () {
 		it("should not remove commas from a function call where comma is in the second parameter", function () {
 			expect(remove_commas("foo(1, 1,234)")).equals("foo(1, 1234)");
 		});
+	});
+	describe("expand_numeric_literals()", function () {
+		it("should expand trillion", function () {
+			expect(expand_numeric_literals("3t")).to.equal("(3 * 1000000000000)");
+		});
+		it("should expand billion", function () {
+			expect(expand_numeric_literals("3b")).to.equal("(3 * 1000000000)");
+		});
+		it("should expand million", function () {
+			expect(expand_numeric_literals("3m")).to.equal("(3 * 1000000)");
+		});
+		it("should expand thousand", function () {
+			expect(expand_numeric_literals("3k")).to.equal("(3 * 1000)");
+		});
+		it("should expand capital trillion", function () {
+			expect(expand_numeric_literals("3T")).to.equal("(3 * 1000000000000)");
+		});
+		it("should expand capital billion", function () {
+			expect(expand_numeric_literals("3B")).to.equal("(3 * 1000000000)");
+		});
+		it("should expand capital million", function () {
+			expect(expand_numeric_literals("3M")).to.equal("(3 * 1000000)");
+		});
+		it("should expand capital thousand", function () {
+			expect(expand_numeric_literals("3K")).to.equal("(3 * 1000)");
+		});
+		it("should expand float million", function () {
+			expect(expand_numeric_literals("3.141m")).to.equal("(3.141 * 1000000)");
+		}
 	});
 });
