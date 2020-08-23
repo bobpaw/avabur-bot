@@ -15,7 +15,7 @@ module.exports = {
 		],
 		"linebreak-style": [
 			"error",
-			process.env.VisualStudioEdition === undefined ? "unix" : "windows"
+			(require("os").EOL === "\r\n" ? "windows" : "unix")
 		],
 		"quotes": [
 			"error",
