@@ -61,7 +61,7 @@ async function handle_message (msg) {
 			reply = "avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot";
 			break;
 		case "!math": case "!calc": case "!calculate":
-				reply = await commands.calculate(msg.content.replace(/^!math ?|calc(?:ulate)? ?/, ""));
+			reply = await commands.calculate(msg.content.replace(/^!math ?|calc(?:ulate)? ?/, ""));
 			break;
 		case "!version":
 			try {
