@@ -4,6 +4,7 @@ const { expect } = require("chai");
 const { add_commas, remove_commas } = require("../lib/util.js");
 
 describe("util.js", function () {
+	// add_commas from "util.js"
 	describe("add_commas()", function () {
 		it("should add commas to integer", function () {
 			expect(add_commas(1234)).equals("1,234");
@@ -33,6 +34,8 @@ describe("util.js", function () {
 			expect(add_commas("Crystal: 1234567,")).equals("Crystal: 1,234,567,");
 		});
 	});
+
+	// remove_commas from "util.js"
 	describe("remove_commas()", function () {
 		it("should remove commas from integer", function () {
 			expect(remove_commas("1,234")).equals("1234");
