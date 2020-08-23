@@ -32,7 +32,7 @@ async function handle_message (msg) {
 		});
 		return;
 	}
-	let reply = "I'm not sure what you want.";
+	let reply = "";
 	if (/^![a-zA-Z]+/.test(msg.content)) {
 		switch (msg.content.match(/^![a-zA-Z]+/)[0]) {
 		case "!ping":
@@ -84,7 +84,7 @@ client.on("message", async (msg) => {
 	if (msg.author.id === client.user.id) return; // Don't process own messages
 	console.log(`${msg.author.tag} (${msg.author.username}) - ${msg.author.id}`);
 	let reply_text = await handle_message(msg);
-	if (reply_text) {
+	if (reply_text && reply_text !== "") {
 		try {
 			command_messages[msg.id] = await msg.reply(reply_text);
 		} catch (e) {
