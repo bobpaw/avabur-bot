@@ -3,15 +3,6 @@ const Secrets = require("./secrets.js");
 
 const {promisify} = require("util");
 
-const basic_math = require("mathjs");
-const math = basic_math.create(basic_math.all);
-math.import({
-	"import": function () { throw new Error("Function import is disabled"); },
-	"createUnit": function () { throw new Error("Function createUnit is disabled"); },
-	"simplify": function () { throw new Error("Function simplify is disabled"); },
-	"derivative": function () { throw new Error("Function derivative is disabled"); }
-}, { override: true });
-
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
@@ -26,9 +17,7 @@ const sql_pool = mysql.createPool({
 sql_pool.query = promisify(sql_pool.query);
 
 const getVersion = require("./lib/get-version.js");
-const get_currency_prices = require("./lib/get-currency-prices.js");
-const handle_market = require("./lib/commands/market.js");
-const {add_commas, remove_commas, expand_numeric_literals} = require("./lib/util.js");
+const commands = require("./lib/commands.js");
 
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -66,58 +55,13 @@ async function handle_message (msg) {
 			break;
 		case "!market":
 			console.log("Getting market currency values.");
-			reply = await handle_market(msg.content.replace(/^!market ?/, ""));
+			reply = await commands.market(msg.content.replace(/^!market ?/, ""));
 			break;
 		case "!source":
 			reply = "avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot";
 			break;
 		case "!math": case "!calc": case "!calculate":
-			try {
-				let currency_prices = await get_currency_prices();
-				let scope = {
-					units: function (curr, n) {
-						if (!(curr in currency_prices)) throw new Error("Invalid currency");
-						let price = 0;
-						const listings = currency_prices[curr];
-						while (n > listings[0].amount) {
-							price += listings[0].amount * listings[0].price;
-							n -= listings[0].amount;
-							listings.shift();
-						}
-						if (n > 0) {
-							price += listings[0].price * n;
-						}
-						return price;
-					},
-					cry: "Crystal", plat: "Platinum", food: "Food",
-					wood: "Wood", iron: "Iron", stone: "Stone",
-					mat: "Crafting Material", frag: "Gem Fragment",
-					c: "Crystal", p: "Platinum", f: "Food", w: "Wood",
-					i: "Iron", s: "Stone", cr: "Crafting Material",
-					g: "Gem Fragment"
-				};
-				let expression = remove_commas(expand_numeric_literals(msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "")).replace(/evaluate|parse/, ""));
-				console.log(`Calculating expression: ${expression}`);
-				try {
-					reply = add_commas(await math.evaluate(expression, scope));
-					console.log(`Expression evaluated to ${reply}`);
-				} catch (e) {
-					console.error("math.evaluate error: %s", e.message);
-					reply = `Error evaluating ${msg.content} expression \`${msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "")}\` -> \`${expression}\``;
-				}
-			} catch (e) {
-				if (e.name === "AbortError") {
-					console.log("Fetch aborted while trying to get currency prices");
-					reply = "Fetch aborted while trying to get currency prices";
-				} else if (e.name === "FetchError") {
-					console.log("Error getting currency prices: %s", e.message);
-					reply = "Error fetching currency prices.";
-				} else {
-					// Yikes, not sure what this is.
-					throw e;
-				}
-				break;
-			}
+				reply = await commands.calculate(msg.content.replace(/^!math ?|calc(?:ulate)? ?/, ""));
 			break;
 		case "!version":
 			try {
