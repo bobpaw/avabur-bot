@@ -21,16 +21,16 @@ describe("util.js", function () {
 			expect(add_commas()).equals("");
 		});
 		it("should not add commas to text", function () {
-			expect("foobar").equals("foobar");
+			expect(add_commas("foobar")).equals("foobar");
 		});
 		it("should add commas to numbers with text", function () {
-			expect("hello 1234 there").equals("hello 1,234 there");
+			expect(add_commas("hello 1234 there")).equals("hello 1,234 there");
 		});
 		it("should add commas to function call", function () {
-			expect("foo(1234)").equals("foo(1,234)");
+			expect(add_commas("foo(1234)")).equals("foo(1,234)");
 		});
 		it("should add commas to comma", function () {
-			expect("Crystal: 1234567,").equals("Crystal: 1,234,567,");
+			expect(add_commas("Crystal: 1234567,")).equals("Crystal: 1,234,567,");
 		});
 	});
 	describe("remove_commas()", function () {
@@ -50,19 +50,19 @@ describe("util.js", function () {
 			expect(remove_commas("")).equals("");
 		})
 		it("should not remove commas from text", function () {
-			expect("foo,bar").equals("foo,bar");
+			expect(remove_commas("foo,bar")).equals("foo,bar");
 		});
 		it("should remove commas from numbers with text", function () {
-			expect("hello 1,234 there").equals("hello 1234 there");
+			expect(remove_commas("hello 1,234 there")).equals("hello 1234 there");
 		});
 		it("should remove commas from function call", function () {
-			expect("foo(1,234)").equals("foo(1234)");
+			expect(remove_commas("foo(1,234)")).equals("foo(1234)");
 		});
 		it("should not remove commas from a function call where comma is in the first parameter", function () {
-			expect("foo(1,234, 1)").equals("foo(1234, 1)");
+			expect(remove_commas("foo(1,234, 1)")).equals("foo(1234, 1)");
 		});
 		it("should not remove commas from a function call where comma is in the second parameter", function () {
-			expect("foo(1, 1,234)").equals("foo(1, 1234)");
+			expect(remove_commas("foo(1, 1,234)")).equals("foo(1, 1234)");
 		});
 	});
 });
