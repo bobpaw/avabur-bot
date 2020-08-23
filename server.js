@@ -28,15 +28,12 @@ sql_pool.query = promisify(sql_pool.query);
 const getVersion = require("./lib/get-version.js");
 const get_currency_prices = require("./lib/get-currency-prices.js");
 const handle_market = require("./lib/commands/market.js");
+const {add_commas, remove_commas} = require("./lib/util.js");
 
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 });
 
-function add_commas (number) {
-	// https://stackoverflow.com/a/2901298/3413725
-	return number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-}
 
 async function handle_message (msg) {
 	if (msg.content === "Everyone An event is starting soon!" && msg.author.bot) {
@@ -50,47 +47,34 @@ async function handle_message (msg) {
 	let reply = "I'm not sure what you want.";
 	if (/^![a-zA-Z]+/.test(msg.content)) {
 		switch (msg.content.match(/^![a-zA-Z]+/)[0]) {
-			case "!ping":
-				reply = "pong";
-				break;
-			case "!luck":
-				console.log("Calculating current luck.");
-				try {
-					let result = await sql_pool.query("select unix_timestamp(time) from events;");
-					result = result.map(x => x["unix_timestamp(time)"]);
-					let changes = result.map((x, i, a) => (i > 0 ? x - a[i - 1] : 0));
-					changes.shift();
-					let avg = changes.reduce((total, x) => total + x, 0) / changes.length;
-					let time_since_last = Date.now() / 1000 - result[result.length - 1];
-					reply = `Event luck is at ${(time_since_last / avg * 100).toFixed(2)}%.`;
-				} catch (e) {
-					console.error(e.message);
-					reply = "Error calculating luck";
-				}
-				break;
-			case "!market":
-				console.log("Getting market currency values.");
-				reply = await handle_market(msg.content.replace(/^!market ?/, ""));
-				break;
-			case "!source":
-				reply = "avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot";
-				break;
-			case "!math": case "!calc": case "!calculate":
-				try {
-					let currency_prices = await get_currency_prices();
-				} catch (e) {
-					if (e.name === "AbortError") {
-						console.log("Fetch aborted while trying to get currency prices");
-						reply = "Fetch aborted while trying to get currency prices";
-					} else if (e.name === "FetchError") {
-						console.log("Error getting currency prices: %s", e.message);
-						reply = "Error fetching currency prices.";
-					} else {
-						// Yikes, not sure what this is.
-						throw e;
-					}
-					break;
-				}
+		case "!ping":
+			reply = "pong";
+			break;
+		case "!luck":
+			console.log("Calculating current luck.");
+			try {
+				let result = await sql_pool.query("select unix_timestamp(time) from events;");
+				result = result.map(x => x["unix_timestamp(time)"]);
+				let changes = result.map((x, i, a) => (i > 0 ? x - a[i - 1] : 0));
+				changes.shift();
+				let avg = changes.reduce((total, x) => total + x, 0) / changes.length;
+				let time_since_last = Date.now() / 1000 - result[result.length - 1];
+				reply = `Event luck is at ${(time_since_last / avg * 100).toFixed(2)}%.`;
+			} catch (e) {
+				console.error(e.message);
+				reply = "Error calculating luck";
+			}
+			break;
+		case "!market":
+			console.log("Getting market currency values.");
+			reply = await handle_market(msg.content.replace(/^!market ?/, ""));
+			break;
+		case "!source":
+			reply = "avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot";
+			break;
+		case "!math": case "!calc": case "!calculate":
+			try {
+				let currency_prices = await get_currency_prices();
 				let scope = {
 					units: function (curr, n) {
 						if (!(curr in currency_prices)) throw new Error("Invalid currency");
@@ -120,7 +104,7 @@ async function handle_message (msg) {
 						.replace(/\b(\d+(?:\.\d+)?)[Kk]/g, "($1 * 1000)");
 					return final_number;
 				};
-				let expression = expand_numeric_literals(msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "").replace(/(?<!\.\d*)(?<=\d+),(?=(\d{3})+(?!\d))/g, "").replace(/evaluate|parse/, ""));
+				let expression = remove_commas(expand_numeric_literals(msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "")).replace(/evaluate|parse/, ""));
 				console.log(`Calculating expression: ${expression}`);
 				try {
 					reply = add_commas(await math.evaluate(expression, scope));
@@ -129,15 +113,28 @@ async function handle_message (msg) {
 					console.error("math.evaluate error: %s", e.message);
 					reply = `Error evaluating ${msg.content} expression \`${msg.content.replace(/^!(?:math|calc(?:ulate)?) /, "")}\` -> \`${expression}\``;
 				}
-				break;
-			case "!version":
-				try {
-					reply = await getVersion();
-				} catch (e) {
-					console.log("Error getting version: %s", e.message);
-					reply = "Error getting version.";
+			} catch (e) {
+				if (e.name === "AbortError") {
+					console.log("Fetch aborted while trying to get currency prices");
+					reply = "Fetch aborted while trying to get currency prices";
+				} else if (e.name === "FetchError") {
+					console.log("Error getting currency prices: %s", e.message);
+					reply = "Error fetching currency prices.";
+				} else {
+					// Yikes, not sure what this is.
+					throw e;
 				}
 				break;
+			}
+			break;
+		case "!version":
+			try {
+				reply = await getVersion();
+			} catch (e) {
+				console.log("Error getting version: %s", e.message);
+				reply = "Error getting version.";
+			}
+			break;
 		case "!help": case "!commands": default:
 			reply = "!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate";
 		}
