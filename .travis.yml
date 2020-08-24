@@ -25,4 +25,5 @@ jobs:
     - stage: "Coverage"
       node_js: node
       script:
-        - npm coverage
+        - npm test
+        - npm run coverage
