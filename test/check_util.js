@@ -50,7 +50,7 @@ describe("util.js", function () {
 			expect(remove_commas(",")).to.equal(",");
 		});
 		it("should not remove commas from nothing", function () {
-			expect(remove_comams()).to.equal("");
+			expect(remove_commas()).to.equal("");
 		})
 		it("should not remove commas from nothing", function () {
 			expect(remove_commas("")).to.equal("");
