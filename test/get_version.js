@@ -24,12 +24,13 @@ describe("getVersion()", function () {
 	it("should return /08a5078 \\(branch: [-_a-zA-Z0-9]+\\)/", async function () {
 		expect(await getVersion("08a507836f9b8888e9f7f4e18b0bcbc8227d39cc")).to.match(/08a5078 \(branch: [-_a-zA-Z0-9]+\)/);
 	});
-	let other_git = SimpleGit();
-	let gitStub;
-	let get_version;
-	let error_spy = sinon.spy(console, "error");
 
 	describe("should responds to exceptions", function () {
+		let other_git = SimpleGit();
+		let gitStub;
+		let get_version;
+		let error_stub = sinon.stub(console, "error");
+
 		beforeEach(function () {
 			gitStub = sinon.stub(other_git, "branch");
 			get_version = proxyquire("../lib/get-version.js", {
@@ -40,19 +41,22 @@ describe("getVersion()", function () {
 		});
 		afterEach(function () {
 			gitStub.restore();
-			error_spy.resetHistory();
+			error_stub.resetHistory();
 		});
+		after(function () {
+			error_stub.restore();
+		})
 		it(`named GitError from git describe by returning ${pkg_version}`, async function () {
 			gitStub.restore();
 			gitStub = sinon.stub(other_git, "raw");
 			gitStub.withArgs(sinon.match.array.deepEquals(["describe", "--exact-match", "--tags", "HEAD"])).throws("GitError", "Zesty testy");
 			expect(await get_version()).to.equal(pkg_version);
-			expect(error_spy.calledWith("Git error while getting version: %s\nFalling back to npm package version.", "Zesty testy")).to.be.true;
+			expect(error_stub.calledWith("Git error while getting version: %s\nFalling back to npm package version.", "Zesty testy")).to.be.true;
 		});
 		it(`named GitError by returning ${pkg_version}`, async function () {
 			gitStub.throws("GitError", "Zesty testy");
 			expect(await get_version()).to.equal(pkg_version);
-			expect(error_spy.calledWith("Git error while getting version: %s\nFalling back to npm package version.", "Zesty testy")).to.be.true;
+			expect(error_stub.calledWith("Git error while getting version: %s\nFalling back to npm package version.", "Zesty testy")).to.be.true;
 		});
 		it(`named GitResponseError by returning ${pkg_version}`, async function () {
 			let zesty = new Error("Zesty testy");
@@ -60,7 +64,7 @@ describe("getVersion()", function () {
 			zesty.name = "GitResponseError";
 			gitStub.throws(zesty);
 			expect(await get_version()).to.equal(pkg_version);
-			expect(error_spy.calledWith("Git error while getting version: %s\nFalling back to npm package version.", "Zesty testy parsed git error")).to.be.true;
+			expect(error_stub.calledWith("Git error while getting version: %s\nFalling back to npm package version.", "Zesty testy parsed git error")).to.be.true;
 		});
 		it("named something else by throwing it", async function () {
 			gitStub.throws(new TypeError("Wrong Zesty"));
