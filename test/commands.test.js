@@ -1,9 +1,8 @@
-const { describe, it, beforeEach, afterEach } = require("mocha");
+const { describe, it } = require("mocha");
 const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
 const expect = chai.expect;
-const sinon = require("sinon");
 const proxyquire = require("proxyquire");
 
 const market_response = {
