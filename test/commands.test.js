@@ -4,6 +4,7 @@ const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 const proxyquire = require("proxyquire");
+const sinon = require("sinon");
 
 const market_response = {
 	Crystal: [
@@ -102,15 +103,69 @@ const market_response = {
 };
 
 describe("commands.js", function () {
+	let console_stub = sinon.stub(console, "error");
+	afterEach(function () {
+		console_stub.resetHistory();
+	});
+	after(function () {
+		console_stub.restore();
+	});
 	describe("market()", function () {
 		const commands = proxyquire("../lib/commands", {
-			"./get-currency-prices": async () => market_response
+			"./get-currency-prices": async () => await market_response
 		});
 		it("should return 17,950,000", async function () {
 			expect(await commands.market("cry")).to.equal("Crystal: 17,950,000");
 		});
-		it("should return 8947", async function () {
+		it("should return 8,947", async function () {
 			expect(await commands.market("plat")).to.equal("Platinum: 8,947");
+		});
+		it("should return 54", async function () {
+			expect(await commands.market("food")).to.equal("Food: 54");
+		})
+		it("should return 40", async function () {
+			expect(await commands.market("wood")).to.equal("Wood: 40");
+		})
+		it("should return 52", async function () {
+			expect(await commands.market("iron")).to.equal("Iron: 52");
+		})
+		it("should return 57", async function () {
+			expect(await commands.market("stone")).to.equal("Stone: 57");
+		})
+		it("should return 4,080", async function () {
+			expect(await commands.market("mats")).to.equal("Crafting Material: 4,080");
+		})
+		it("should return 449", async function () {
+			expect(await commands.market("frag")).to.equal("Gem Fragment: 449");
+		});
+		it("should return 'Nobody is selling Glimmer'", async function () {
+			await expect(commands.market("Glimmer")).to.eventually.equal("Nobody is selling Glimmer");
+		});
+		describe("should respond to errors named:", function () {
+			let throw_stub = sinon.stub();
+			let throw_commands;
+			beforeEach(function () {
+				throw_commands = proxyquire("../lib/commands", {
+					"./get-currency-prices": async () => { await throw_stub(); }
+				});
+			});
+			afterEach(function () {
+				throw_stub = sinon.stub();
+			})
+			it("AbortError by returning 'Fetch aborted while trying to get currency prices.'", async function () {
+				throw_stub.throws("AbortError", "Zesty testy");
+				await expect(throw_commands.market("frag")).to.eventually.equal("Fetch aborted while trying to get currency prices.");
+				expect(console_stub.calledOnceWith("Fetch aborted while trying to get currency prices.")).to.be.true;
+			});
+			it("FetchError by returning 'Error fetching currency prices'", async function () {
+				throw_stub.throws("FetchError", "Zesty testy");
+				await expect(throw_commands.market("frag")).to.eventually.equal("Error fetching currency prices.");
+				expect(console_stub.calledOnceWith("Error getting currency prices: %s", "Zesty testy")).to.be.true;
+			});
+			it("something else by throwing it", async function () {
+				throw_stub.throws(new TypeError("Zesty testy"));
+				await expect(throw_commands.market("frag")).to.be.rejectedWith(TypeError, "Zesty testy");
+			})
 		});
 	});
 });
