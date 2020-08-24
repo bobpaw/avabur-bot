@@ -21,7 +21,7 @@ describe("getVersion()", function () {
 	it("should return v1.1.0", async function () {
 		expect(await getVersion("8835f11d6c00b61fc2e2a27fe9ce66653118a7bb")).to.equal("v1.1.0");
 	});
-	it("should return /08a5078 \(branch: [-_a-zA-Z0-9]+\)/", async function () {
+	it("should return /08a5078 \\(branch: [-_a-zA-Z0-9]+\\)/", async function () {
 		expect(await getVersion("08a507836f9b8888e9f7f4e18b0bcbc8227d39cc")).to.match(/08a5078 \(branch: [-_a-zA-Z0-9]+\)/);
 	});
 	let other_git = SimpleGit();
