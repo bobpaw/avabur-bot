@@ -1,15 +1,15 @@
 module.exports = {
-	"env": {
-		"browser": true,
-		"commonjs": true,
-		"es2020": true
+	env: {
+		browser: true,
+		commonjs: true,
+		es2020: true
 	},
-	"extends": "eslint:recommended",
-	"parserOptions": {
-		"ecmaVersion": 11
+	extends: "eslint:recommended",
+	parserOptions: {
+		ecmaVersion: 11
 	},
-	"rules": {
-		"indent": [
+	rules: {
+		indent: [
 			"error",
 			"tab"
 		],
@@ -17,11 +17,15 @@ module.exports = {
 			"error",
 			(require("os").EOL === "\r\n" ? "windows" : "unix")
 		],
-		"quotes": [
+		quotes: [
 			"error",
 			"double"
 		],
-		"semi": [
+		"quote-props": [
+			"error",
+			"as-needed"
+		],
+		semi: [
 			"error",
 			"always"
 		]
