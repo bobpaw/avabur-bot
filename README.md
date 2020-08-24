@@ -1,5 +1,5 @@
 # avabur-bot
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fbobpaw%2Favabur-bot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fbobpaw%2Favabur-bot?ref=badge_shield)[![Build Status](https://travis-ci.com/bobpaw/avabur-bot.svg?branch=master)](https://travis-ci.com/bobpaw/avabur-bot)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fbobpaw%2Favabur-bot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fbobpaw%2Favabur-bot?ref=badge_shield)[![Build Status](https://travis-ci.com/bobpaw/avabur-bot.svg?branch=master)](https://travis-ci.com/bobpaw/avabur-bot)[![Coverage Status](https://coveralls.io/repos/github/bobpaw/avabur-bot/badge.svg?branch=master)](https://coveralls.io/github/bobpaw/avabur-bot?branch=master)
 
 
 Requires a mysql database setup with:
