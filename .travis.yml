@@ -5,6 +5,9 @@ node_js:
   - 12
   - 11
 
+git:
+  - depth: false
+
 jobs:
   include:
     - stage: "FOSSA"
