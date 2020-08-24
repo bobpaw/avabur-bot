@@ -6,10 +6,12 @@ node_js:
   - 11
 
 git:
-  - depth: false
+  depth: false
 
 jobs:
   include:
+    - os: windows
+    - os: osx
     - stage: "FOSSA"
       node_js: node
       before_script:
@@ -20,3 +22,7 @@ jobs:
       after_success:
       # Set push-only key if regular one is unavailable (i.e. this is a pull-request from a fork).
         - FOSSA_API_KEY="${FOSSA_API_KEY=-78908c4dfc682bcd6fbe2bd38816359c}" fossa test
+    - stage: "Coverage"
+      node_js: node
+      script:
+        - npm coverage
