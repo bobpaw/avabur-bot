@@ -1,4 +1,4 @@
-const { describe, it } = require("mocha");
+const { describe, it, beforeEach, after, afterEach } = require("mocha");
 const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
@@ -122,19 +122,19 @@ describe("commands.js", function () {
 		});
 		it("should return 54", async function () {
 			expect(await commands.market("food")).to.equal("Food: 54");
-		})
+		});
 		it("should return 40", async function () {
 			expect(await commands.market("wood")).to.equal("Wood: 40");
-		})
+		});
 		it("should return 52", async function () {
 			expect(await commands.market("iron")).to.equal("Iron: 52");
-		})
+		});
 		it("should return 57", async function () {
 			expect(await commands.market("stone")).to.equal("Stone: 57");
-		})
+		});
 		it("should return 4,080", async function () {
 			expect(await commands.market("mats")).to.equal("Crafting Material: 4,080");
-		})
+		});
 		it("should return 449", async function () {
 			expect(await commands.market("frag")).to.equal("Gem Fragment: 449");
 		});
@@ -151,7 +151,7 @@ describe("commands.js", function () {
 			});
 			afterEach(function () {
 				throw_stub = sinon.stub();
-			})
+			});
 			it("AbortError by returning 'Fetch aborted while trying to get currency prices.'", async function () {
 				throw_stub.throws("AbortError", "Zesty testy");
 				await expect(throw_commands.market("frag")).to.eventually.equal("Fetch aborted while trying to get currency prices.");
@@ -165,7 +165,7 @@ describe("commands.js", function () {
 			it("something else by throwing it", async function () {
 				throw_stub.throws(new TypeError("Zesty testy"));
 				await expect(throw_commands.market("frag")).to.be.rejectedWith(TypeError, "Zesty testy");
-			})
+			});
 		});
 	});
 });
