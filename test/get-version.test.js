@@ -45,7 +45,7 @@ describe("getVersion()", function () {
 		});
 		after(function () {
 			error_stub.restore();
-		})
+		});
 		it(`named GitError from git describe by returning ${pkg_version}`, async function () {
 			gitStub.restore();
 			gitStub = sinon.stub(other_git, "raw");
