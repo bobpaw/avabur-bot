@@ -8,6 +8,9 @@ node_js:
 git:
   depth: false
 
+before_install:
+  - cat /proc/cpuinfo | grep 'processor';
+
 jobs:
   include:
     - os: windows
