@@ -117,29 +117,33 @@ describe("commands.js", function () {
 			"./get-currency-prices": async () => await market_response
 		});
 		it("should return 17,950,000", async function () {
-			expect(await commands.market("cry")).to.equal("Crystal: 17,950,000");
+			await expect(commands.market("crystals")).to.eventually.equal("Crystal: 17,950,000");
 		});
 		it("should return 8,947", async function () {
-			expect(await commands.market("plat")).to.equal("Platinum: 8,947");
+			await expect(commands.market("platinum")).to.eventually.equal("Platinum: 8,947");
 		});
 		it("should return 54", async function () {
-			expect(await commands.market("food")).to.equal("Food: 54");
+			await expect(commands.market("food")).to.eventually.equal("Food: 54");
 		});
 		it("should return 40", async function () {
-			expect(await commands.market("wood")).to.equal("Wood: 40");
+			await expect(commands.market("wood")).to.eventually.equal("Wood: 40");
 		});
 		it("should return 52", async function () {
-			expect(await commands.market("iron")).to.equal("Iron: 52");
+			await expect(commands.market("iron")).to.eventually.equal("Iron: 52");
 		});
 		it("should return 57", async function () {
-			expect(await commands.market("stone")).to.equal("Stone: 57");
+			await expect(commands.market("stone")).to.eventually.equal("Stone: 57");
 		});
 		it("should return 4,080", async function () {
-			expect(await commands.market("mats")).to.equal("Crafting Material: 4,080");
+			await expect(commands.market("crafting_materials")).to.eventually.equal("Crafting Material: 4,080");
+		});
+		it("should return 4,080", async function () {
+			await expect(commands.market("m")).to.eventually.equal("Crafting Material: 4,080");
 		});
 		it("should return 449", async function () {
-			expect(await commands.market("frag")).to.equal("Gem Fragment: 449");
+			await expect(commands.market("frag")).to.eventually.equal("Gem Fragment: 449");
 		});
+		it("should return all the same stuff for all capital strings");
 		it("should return 'Nobody is selling Glimmer'", async function () {
 			await expect(commands.market("Glimmer")).to.eventually.equal("Nobody is selling Glimmer");
 		});
@@ -167,6 +171,78 @@ describe("commands.js", function () {
 			it("something else by throwing it", async function () {
 				throw_stub.throws(new TypeError("Zesty testy"));
 				await expect(throw_commands.market("frag")).to.be.rejectedWith(TypeError, "Zesty testy");
+			});
+		});
+	});
+	describe("calculate()", function () {
+		const commands = proxyquire("../lib/commands", {
+			"./get-currency-prices": async () => await market_response
+		});
+		it("should return ''", async function () {
+			await expect(commands.calculate()).to.eventually.equal("");
+		});
+		it("should return 4,000", async function () {
+			await expect(commands.calculate("4000")).to.eventually.equal("4,000");
+		});
+		it("should return 16", async function () {
+			await expect(commands.calculate("4 * 4")).to.eventually.equal("16");
+		});
+		it("should return 10,784,659,896", async function () {
+			await expect(commands.calculate("units(cry, 600)")).to.eventually.equal("10,784,659,896");
+		});
+		it("should return 'Error evaluating units('glimmer', 1) expression `units('glimmer', 1)` -> `units('glimmer', 1)`'", async function () {
+			await expect(commands.calculate("units('glimmer', 1)")).to.eventually.equal("Error evaluating units('glimmer', 1) expression `units('glimmer', 1)` -> `units('glimmer', 1)`");
+			expect(console_stub.calledOnceWith("math.evaluate error: %s", "Invalid currency")).to.be.true;
+		});
+		it("should return 5,000", async function () {
+			await expect(commands.calculate("max_units(plat, 44,736,700)")).to.eventually.equal("5,000");
+		});
+		it("should return 'Error evaluating max_units('glimmer', 1) expression `max_units('glimmer', 1)` -> `max_units('glimmer', 1)`'", async function () {
+			await expect(commands.calculate("max_units('glimmer', 1)")).to.eventually.equal("Error evaluating max_units('glimmer', 1) expression `max_units('glimmer', 1)` -> `max_units('glimmer', 1)`");
+			expect(console_stub.calledOnceWith("math.evaluate error: %s", "Invalid currency")).to.be.true;
+		});
+		describe("should throw ReferenceError", function () {
+			it("when import is called", async function () {
+				await expect(commands.calculate("import(42)")).to.eventually.equal("Error evaluating import(42) expression `import(42)` -> `import(42)`");
+				expect(console_stub.calledOnceWith("math.evaluate error: %s", "Function import is disabled")).to.be.true;
+			});
+			it("when createUnit is called", async function () {
+				await expect(commands.calculate("createUnit(42)")).to.eventually.equal("Error evaluating createUnit(42) expression `createUnit(42)` -> `createUnit(42)`");
+				expect(console_stub.calledOnceWith("math.evaluate error: %s", "Function createUnit is disabled")).to.be.true;
+			});
+			it("when simplify is called", async function () {
+				await expect(commands.calculate("simplify(42)")).to.eventually.equal("Error evaluating simplify(42) expression `simplify(42)` -> `simplify(42)`");
+				expect(console_stub.calledOnceWith("math.evaluate error: %s", "Function simplify is disabled")).to.be.true;
+			});
+			it("when derivative is called", async function () {
+				await expect(commands.calculate("derivative(42)")).to.eventually.equal("Error evaluating derivative(42) expression `derivative(42)` -> `derivative(42)`");
+				expect(console_stub.calledOnceWith("math.evaluate error: %s", "Function derivative is disabled")).to.be.true;
+			});
+		});
+		describe("should respond to errors named:", function () {
+			let throw_stub = sinon.stub();
+			let throw_commands;
+			beforeEach(function () {
+				throw_commands = proxyquire("../lib/commands", {
+					"./get-currency-prices": async () => { await throw_stub(); }
+				});
+			});
+			afterEach(function () {
+				throw_stub = sinon.stub();
+			});
+			it("AbortError by returning 'Fetch aborted while trying to get currency prices.'", async function () {
+				throw_stub.throws("AbortError", "Zesty testy");
+				await expect(throw_commands.calculate("units(frag, 1)")).to.eventually.equal("Fetch aborted while trying to get currency prices.");
+				expect(console_stub.calledOnceWith("Fetch aborted while trying to get currency prices.")).to.be.true;
+			});
+			it("FetchError by returning 'Error fetching currency prices'", async function () {
+				throw_stub.throws("FetchError", "Zesty testy");
+				await expect(throw_commands.calculate("units(frag, 1)")).to.eventually.equal("Error fetching currency prices.");
+				expect(console_stub.calledOnceWith("Error getting currency prices: %s", "Zesty testy")).to.be.true;
+			});
+			it("something else by throwing it", async function () {
+				throw_stub.throws(new TypeError("Zesty testy"));
+				await expect(throw_commands.calculate("units(frag, 1)")).to.be.rejectedWith(TypeError, "Zesty testy");
 			});
 		});
 	});
