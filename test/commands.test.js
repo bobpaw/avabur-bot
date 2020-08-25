@@ -141,9 +141,19 @@ describe("commands.js", function () {
 			await expect(commands.market("m")).to.eventually.equal("Crafting Material: 4,080");
 		});
 		it("should return 449", async function () {
-			await expect(commands.market("frag")).to.eventually.equal("Gem Fragment: 449");
+			await expect(commands.market("gem_fragments")).to.eventually.equal("Gem Fragment: 449");
 		});
-		it("should return all the same stuff for all capital strings");
+		it("should return all the same stuff for all capital strings", async function () {
+			await expect(commands.market("CRYSTALS")).to.eventually.equal("Crystal: 17,950,000");
+			await expect(commands.market("PLATINUM")).to.eventually.equal("Platinum: 8,947");
+			await expect(commands.market("FOOD")).to.eventually.equal("Food: 54");
+			await expect(commands.market("WOOD")).to.eventually.equal("Wood: 40");
+			await expect(commands.market("IRON")).to.eventually.equal("Iron: 52");
+			await expect(commands.market("STONE")).to.eventually.equal("Stone: 57");
+			await expect(commands.market("CRAFTING_MATERIALS")).to.eventually.equal("Crafting Material: 4,080");
+			await expect(commands.market("M")).to.eventually.equal("Crafting Material: 4,080");
+			await expect(commands.market("GEM_FRAGMENTS")).to.eventually.equal("Gem Fragment: 449");
+		});
 		it("should return 'Nobody is selling Glimmer'", async function () {
 			await expect(commands.market("Glimmer")).to.eventually.equal("Nobody is selling Glimmer");
 		});
@@ -187,6 +197,9 @@ describe("commands.js", function () {
 		it("should return 16", async function () {
 			await expect(commands.calculate("4 * 4")).to.eventually.equal("16");
 		});
+		it("should return 0", async function () {
+			await expect(commands.calculate("units(cry, 0)")).to.eventually.equal("0");
+		});
 		it("should return 10,784,659,896", async function () {
 			await expect(commands.calculate("units(cry, 600)")).to.eventually.equal("10,784,659,896");
 		});
@@ -200,6 +213,9 @@ describe("commands.js", function () {
 		it("should return 'Error evaluating max_units('glimmer', 1) expression `max_units('glimmer', 1)` -> `max_units('glimmer', 1)`'", async function () {
 			await expect(commands.calculate("max_units('glimmer', 1)")).to.eventually.equal("Error evaluating max_units('glimmer', 1) expression `max_units('glimmer', 1)` -> `max_units('glimmer', 1)`");
 			expect(console_stub.calledOnceWith("math.evaluate error: %s", "Invalid currency")).to.be.true;
+		});
+		it("should return 0", async function () {
+			await expect(commands.calculate("max_units(cry, 0)")).to.eventually.equal("0");
 		});
 		describe("should throw ReferenceError", function () {
 			it("when import is called", async function () {
