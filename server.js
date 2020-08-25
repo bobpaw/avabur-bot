@@ -30,7 +30,6 @@ async function handle_message (msg) {
 			if (err) throw err;
 			console.log("Logged current time in events table");
 		});
-		return;
 	}
 	let reply = "";
 	if (/^![a-zA-Z]+/.test(msg.content)) {
