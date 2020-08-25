@@ -103,12 +103,15 @@ const market_response = {
 };
 
 describe("commands.js", function () {
-	let console_stub = sinon.stub(console, "error");
+	let console_stub;
+	before(function () {
+		console_stub = sinon.stub(console, "error");
+	});
 	afterEach(function () {
 		console_stub.resetHistory();
 	});
 	after(function () {
-		console_stub.restore();
+		console.error.restore();
 	});
 	describe("market()", function () {
 		const commands = proxyquire("../lib/commands", {
