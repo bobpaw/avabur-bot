@@ -1,4 +1,3 @@
-const { describe, it } = require("mocha");
 const { expect } = require("chai");
 
 const { add_commas, remove_commas, expand_numeric_literals } = require("../lib/util.js");

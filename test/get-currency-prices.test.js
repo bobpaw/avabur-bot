@@ -1,4 +1,3 @@
-const { describe, it } = require("mocha");
 const { expect } = require("chai");
 const get_currency_prices = require("../lib/get-currency-prices.js");
 

@@ -1,4 +1,3 @@
-const { describe, it, beforeEach, afterEach, after } = require("mocha");
 const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
@@ -29,11 +28,11 @@ describe("getVersion()", function () {
 		let other_git = SimpleGit();
 		let gitStub;
 		let get_version;
-		let error_stub;;
+		let error_stub;
 
 		before(function () {
 			error_stub = sinon.stub(console, "error");
-		})
+		});
 		beforeEach(function () {
 			gitStub = sinon.stub(other_git, "branch");
 			get_version = proxyquire("../lib/get-version.js", {
