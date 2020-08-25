@@ -13,5 +13,5 @@ module.exports = {
   timeout: 4000,
   ui: 'bdd',
   'watch-files': ['test/**/*.js'],
-  'watch-ignore': ['lib/vendor']
+  'watch-ignore': ['lib/vendor', 'node_modules']
 };
