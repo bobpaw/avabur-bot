@@ -10,7 +10,7 @@ module.exports = {
 		ecmaVersion: 11
 	},
 	rules: {
-		indent: [
+		"indent": [
 			"error",
 			"tab"
 		],
@@ -18,15 +18,15 @@ module.exports = {
 			"error",
 			(require("os").EOL === "\r\n" ? "windows" : "unix")
 		],
-		quotes: [
+		"quotes": [
 			"error",
 			"double"
 		],
 		"quote-props": [
 			"error",
-			"as-needed"
+			"consistent-as-needed"
 		],
-		semi: [
+		"semi": [
 			"error",
 			"always"
 		]
