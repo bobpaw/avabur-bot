@@ -26,10 +26,8 @@ client.on("ready", () => {
 async function handle_message (msg) {
 	if (msg.content === "Everyone An event is starting soon!" && msg.author.bot) {
 		console.log("Received Event starting message");
-		sql_pool.query("insert into events (time) values (current_timestamp())", function (err) {
-			if (err) throw err;
-			console.log("Logged current time in events table");
-		});
+		await sql_pool.query("insert into events (time) values (current_timestamp())");
+		console.log("Logged current time in events table");
 	}
 	let reply = "";
 	if (/^![a-zA-Z]+/.test(msg.content)) {
