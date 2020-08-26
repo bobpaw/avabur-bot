@@ -81,7 +81,7 @@ client.on("message", async (msg) => {
 	if (msg.author.id === client.user.id) return; // Don't process own messages
 	console.log(`${msg.author.tag} (${msg.author.username}) - ${msg.author.id}`);
 	let reply_text = await handle_message(msg);
-	if (reply_text && reply_text !== "") {
+	if (typeof reply_text !== "undefined" && reply_text !== "") {
 		try {
 			command_messages[msg.id] = await msg.reply(reply_text);
 		} catch (e) {
