@@ -1,5 +1,5 @@
 "use strict";
-const Secrets = require("./secrets.js");
+const Secrets = require("./secrets");
 
 const {promisify} = require("util");
 
