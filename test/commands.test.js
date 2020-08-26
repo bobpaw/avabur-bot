@@ -6,7 +6,7 @@ const proxyquire = require("proxyquire");
 const sinon = require("sinon");
 
 const market_response = {
-	Crystal: [
+	"Crystal": [
 		{ price: 17950000, amount: 536, seller: "trgKai" },
 		{ price: 18175000, amount: 12, seller: "pok" },
 		{ price: 18179998, amount: 76, seller: "michaelts" },
@@ -18,7 +18,7 @@ const market_response = {
 		{ price: 18497999, amount: 26, seller: "GutsTheSwordsman" },
 		{ price: 18499999, amount: 42, seller: "Juvator" }
 	],
-	Platinum: [
+	"Platinum": [
 		{ price: 8947, amount: 3389, seller: "hohmono" },
 		{ price: 8948, amount: 10000, seller: "NameHere" },
 		{ price: 8949, amount: 11670, seller: "Niq" },
@@ -30,7 +30,7 @@ const market_response = {
 		{ price: 8987, amount: 98844, seller: "Mansku" },
 		{ price: 8990, amount: 211000, seller: "WooliMammoth" }
 	],
-	Food: [
+	"Food": [
 		{ price: 54, amount: 133525797, seller: "Teerick" },
 		{ price: 55, amount: 83563340, seller: "SinX" },
 		{ price: 58, amount: 100101206, seller: "Thelimevodka" },
@@ -41,7 +41,7 @@ const market_response = {
 		{ price: 81, amount: 10000000, seller: "desgohtdinixo" },
 		{ price: 10000000, amount: 100, seller: "Toskha" }
 	],
-	Wood: [
+	"Wood": [
 		{ price: 40, amount: 251692445, seller: "Kudon" },
 		{ price: 42, amount: 100000000, seller: "zorpinox" },
 		{ price: 43, amount: 25034327, seller: "Artie" },
@@ -53,7 +53,7 @@ const market_response = {
 		{ price: 60, amount: 150000000, seller: "Moist" },
 		{ price: 68, amount: 10000000, seller: "desgohtdinixo" }
 	],
-	Iron: [
+	"Iron": [
 		{ price: 52, amount: 28703384, seller: "Grunstadt" },
 		{ price: 54, amount: 253673795, seller: "boxsalesman" },
 		{ price: 59, amount: 4460808, seller: "namfeod" },
@@ -63,7 +63,7 @@ const market_response = {
 		{ price: 100, amount: 100000000, seller: "Nauki" },
 		{ price: 1000000, amount: 100, seller: "Toskha" }
 	],
-	Stone: [
+	"Stone": [
 		{ price: 57, amount: 9990000, seller: "pubsta" },
 		{ price: 58, amount: 8994000, seller: "atacca" },
 		{ price: 59, amount: 7639600, seller: "McYeet" },
