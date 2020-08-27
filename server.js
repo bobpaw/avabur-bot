@@ -42,7 +42,10 @@ async function handle_message (msg) {
 				result = result.map(x => x["unix_timestamp(time)"]);
 				let changes = result.map((x, i, a) => (i > 0 ? x - a[i - 1] : 0));
 				changes.shift();
-				let avg = changes.reduce((total, x) => total + x, 0) / changes.length;
+
+				// Remove long times where NoA script was down
+				let counted_entries = 0;
+				let avg = changes.reduce((total, x) => { counted_entries++; return total + (x > 21600 ? 0 : x); }, 0) / counted_entries;
 				let time_since_last = Date.now() / 1000 - result[result.length - 1];
 				reply = `Event luck is at ${(time_since_last / avg * 100).toFixed(2)}%.`;
 			} catch (e) {
