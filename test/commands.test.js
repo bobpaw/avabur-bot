@@ -269,26 +269,25 @@ describe("commands.js", function () {
 		const sql_pool = { query: sinon.stub().resolves("") };
 		const commands = proxyquire("../lib/commands", {
 			"./get-version.js": () => Promise.resolve("Zestiest version available."),
-			"./get-currency-prices.js": function () {
-				return Promise.resolve({
-					Crystal: [
-						{ price: 17950000, amount: 536, seller: "trgKai" },
-						{ price: 18175000, amount: 12, seller: "pok" }
-					]
-				});
-			},
+			"./get-currency-prices.js": () => Promise.resolve({
+				Crystal: [
+					{ price: 17950000, amount: 536, seller: "trgKai" },
+					{ price: 18175000, amount: 12, seller: "pok" }
+				]
+			}),
 			"mysql": {
 				createPool: () => sql_pool
+			},
+			"util": {
+				promisify: (x) => x
 			}
 		});
-		let message = function (text) {
-			return {
-				id: 7,
-				author: { id: 13, tag: "Wumpus#0000", username: "Wumpus", bot: false },
-				content: text,
-				reply: sinon.stub()
-			};
-		};
+		let message = (text) => new Object({
+			id: 7,
+			author: { id: 13, tag: "Wumpus#0000", username: "Wumpus", bot: false },
+			content: text,
+			reply: sinon.stub()
+		});
 		it("should reply nothing", async function () {
 			await expect(commands.handle_message(message("jerry"))).to.eventually.equal("");
 		});
@@ -297,9 +296,9 @@ describe("commands.js", function () {
 			let sql_message = message("Everyone An event is starting soon!");
 			sql_message.author.bot = true;
 			await expect(commands.handle_message(sql_message)).to.eventually.equal("");
-			expect(sql_pool.query.calledOnceWithExactly("insert into events(time) values(current_timestamp())")).to.be.true;
-			expect(log_stub.calledWithExactly("Received Event starting message")).to.be.true;
-			expect(log_stub.calledWithExactly("Logged current time in events table")).to.be.true;
+			expect(sql_pool.query.calledOnceWithExactly("insert into events (time) values (current_timestamp())"), "SQL Pool.query not called with `insert into events(time) values(current_timestamp())'").to.be.true;
+			expect(log_stub.calledWithExactly("Received Event starting message"), "Received Event message not logged.").to.be.true;
+			expect(log_stub.calledWithExactly("Logged current time in events table"), "Successfully insert'd message not logged").to.be.true;
 			sql_pool.query.reset();
 		});
 		it("should reply with help string", async function () {
