@@ -8,16 +8,9 @@ const proxyquire = require("proxyquire");
 const Discord = require("discord.js");
 const client = new Discord.Client();
 let login_stub = sinon.stub(client, "login");
-client.user = {
-	id: 1,
-	user: {id: 2, tag: "avabur-bot#0000", username: "avabur-bot", bot: true }
-};
+client.user = { id: 1, tag: "avabur-bot#0000", username: "avabur-bot", bot: true };
 let messageStub = sinon.stub();
 client.on("message", messageStub);
-
-const sql_pool = {
-	query: sinon.stub().resolves("")
-};
 
 describe("server.js", function () {
 	proxyquire("../server.js", {
@@ -30,8 +23,9 @@ describe("server.js", function () {
 			bot_token: "token",
 			sql_pass: "password"
 		},
-		"util": {
-			promisify: sinon.stub().withArgs(sql_pool.query).returns(Promise.resolve(sql_pool.query))
+		"./lib/commands": {
+			"handle_command": () => { "Response"; },
+			"@noCallThru": true
 		}
 	});
 
