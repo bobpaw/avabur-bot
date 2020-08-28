@@ -265,4 +265,70 @@ describe("commands.js", function () {
 			});
 		});
 	});
+	describe("handle_commands()", function () {
+		const sql_pool = { query: sinon.stub().resolves("") };
+		const commands = proxyquire("../lib/commands", {
+			"./get-version.js": () => Promise.resolve("Zestiest version available."),
+			"./get-currency-prices.js": function () {
+				return Promise.resolve({
+					Crystal: [
+						{ price: 17950000, amount: 536, seller: "trgKai" },
+						{ price: 18175000, amount: 12, seller: "pok" }
+					]
+				});
+			},
+			"mysql": {
+				createPool: () => sql_pool
+			}
+		});
+		let message = function (text) {
+			return {
+				id: 7,
+				author: { id: 13, tag: "Wumpus#0000", username: "Wumpus", bot: false },
+				content: text,
+				reply: sinon.stub()
+			};
+		};
+		it("should reply nothing", async function () {
+			await expect(commands.handle_message(message("jerry"))).to.eventually.equal("");
+		});
+		it("should query MySQL server", async function () {
+			this.timeout(20);
+			let sql_message = message("Everyone An event is starting soon!");
+			sql_message.author.bot = true;
+			await expect(commands.handle_message(sql_message)).to.eventually.equal("");
+			expect(sql_pool.query.calledOnceWithExactly("insert into events(time) values(current_timestamp())")).to.be.true;
+			expect(log_stub.calledWithExactly("Received Event starting message")).to.be.true;
+			expect(log_stub.calledWithExactly("Logged current time in events table")).to.be.true;
+			sql_pool.query.reset();
+		});
+		it("should reply with help string", async function () {
+			await expect(commands.handle_message(message("!help"))).to.eventually.equal("!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate");
+		});
+		it("should reply with pong", async function () {
+			await expect(commands.handle_message(message("!ping"))).to.eventually.equal("pong");
+		});
+		it("should reply with source info", async function () {
+			await expect(commands.handle_message(message("!source"))).to.eventually.equal("avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot");
+		});
+		it("should do some math", async function () {
+			await expect(commands.handle_message(message("!calc 40 * 32"))).to.eventually.equal("1,280");
+		});
+		it("should return version", async function () {
+			await expect(commands.handle_message(message("!version"))).to.eventually.equal("Zestiest version available.");
+		});
+		it("should return 'error getting version'", async function () {
+			let throw_commands = proxyquire("../lib/commands", {
+				"./get-version.js": () => Promise.reject(new Error("Gung ho!"))
+			});
+			await expect(throw_commands.handle_message(message("!version"))).to.eventually.equal("Error getting version.");
+			expect(log_stub.calledOnceWithExactly("Error getting version: %s", "Gung ho!")).to.be.true;
+		});
+		it("should return crystal market value", async function () {
+			await expect(commands.handle_message(message("!market cry"))).to.eventually.equal("Crystal: 17,950,000");
+		});
+		it("should return nobody is selling", async function () {
+			await expect(commands.handle_message(message("!market glimmer"))).to.eventually.equal("Nobody is selling glimmer");
+		});
+	});
 });

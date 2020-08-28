@@ -12,9 +12,11 @@ client.user = {
 	id: 1,
 	user: {id: 2, tag: "avabur-bot#0000", username: "avabur-bot", bot: true }
 };
+let messageStub = sinon.stub();
+client.on("message", messageStub);
 
 const sql_pool = {
-	query: sinon.stub().returns(Promise.resolve(""))
+	query: sinon.stub().resolves("")
 };
 
 describe("server.js", function () {
@@ -22,11 +24,6 @@ describe("server.js", function () {
 		"discord.js": {
 			Client: function () {
 				return client;
-			}
-		},
-		"mysql": {
-			createPool: function () {
-				return sql_pool;
 			}
 		},
 		"./secrets": {
@@ -63,19 +60,22 @@ describe("server.js", function () {
 		console.log.restore();
 		console.error.restore();
 	});
-	it("should reply nothing", function (done) {
-		this.timeout(20);
-		fakeMessage.content = "jerry";
+	let sendMessage = (self, done, text) => {
+		let msgObject = fakeMessage;
+		self.timeout(20);
+		switch (typeof text) {
+		case "string":
+			msgObject.content = text;
+			break;
+		case "object":
+			msgObject = text;
+		}
 		client.once("message", function () { done(); });
-		client.emit("message", fakeMessage);
-		expect(fakeMessage.reply.called).to.be.false;
-	});
+		client.emit("message", msgObject);
+	};
 	it("should error when reply throws", function (done) {
-		this.timeout(20);
-		fakeMessage.content = "!help";
 		fakeMessage.reply.throws("Error", "Zesty testy");
-		client.once("message", function () { done(); });
-		client.emit("message", fakeMessage);
+		sendMessage(this, done);
 		expect(error_stub.calledOnceWithExactly("Error replying to message: %s", "Zesty testy")).to.be.true;
 	});
 	it("should have only called login once", function (done) {
@@ -83,30 +83,5 @@ describe("server.js", function () {
 		client.emit("ready");
 		expect(login_stub.calledOnce).to.be.true;
 		expect(log_stub.calledOnceWithExactly("Logged in as avabur-bot#0000!"));
-	});
-	it("should query MySQL server", function (done) {
-		let sql_message = { ...fakeMessage };
-		sql_message.content = "Everyone An event is starting soon!";
-		sql_message.author.bot = true;
-		client.once("message", function () { done(); });
-		client.emit("message", sql_message);
-		expect(sql_pool.query.calledOnceWithExactly("insert into events(time) values(current_timestamp())"));
-		expect(log_stub.calledWithExactly("Received Event starting message")).to.be.true;
-		expect(log_stub.calledWithExactly("Logged current time in events table")).to.be.true;
-		sql_pool.query.reset();
-	});
-	it("should reply with help string", function (done) {
-		this.timeout(20);
-		fakeMessage.content = "!help";
-		client.once("message", function () { done(); });
-		client.emit("message", fakeMessage);
-		expect(fakeMessage.reply.calledOnceWithExactly("!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate"));
-	});
-	it("should reply with pong", function (done) {
-		this.timeout(20);
-		fakeMessage.content = "!ping";
-		client.once("message", function () { done(); });
-		client.emit("message", fakeMessage);
-		expect(fakeMessage.reply.calledOnceWithExactly("pong"));
 	});
 });
