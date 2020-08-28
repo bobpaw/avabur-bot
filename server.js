@@ -1,82 +1,14 @@
 "use strict";
 const Secrets = require("./secrets");
 
-const {promisify} = require("util");
-
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
-const mysql = require("mysql");
-const sql_pool = mysql.createPool({
-	connectionLimit: 5,
-	host: "localhost",
-	user: "avabur-bot",
-	password: Secrets.sql_pass,
-	database: "avabur"
-});
-sql_pool.query = promisify(sql_pool.query);
-
-const getVersion = require("./lib/get-version.js");
-const commands = require("./lib/commands.js");
+const { handle_message } = require("./lib/commands.js");
 
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 });
-
-async function handle_message (msg) {
-	if (msg.content === "Everyone An event is starting soon!" && msg.author.bot) {
-		console.log("Received Event starting message");
-		await sql_pool.query("insert into events (time) values (current_timestamp())");
-		console.log("Logged current time in events table");
-	}
-	let reply = "";
-	if (/^![a-zA-Z]+/.test(msg.content)) {
-		switch (msg.content.match(/^![a-zA-Z]+/)[0]) {
-		case "!ping":
-			reply = "pong";
-			break;
-		case "!luck":
-			console.log("Calculating current luck.");
-			try {
-				let result = await sql_pool.query("select unix_timestamp(time) from events;");
-				result = result.map(x => x["unix_timestamp(time)"]);
-				let changes = result.map((x, i, a) => (i > 0 ? x - a[i - 1] : 0));
-				changes.shift();
-
-				// Remove long times where NoA script was down
-				let counted_entries = 0;
-				let avg = changes.reduce((total, x) => { counted_entries++; return total + (x > 21600 ? 0 : x); }, 0) / counted_entries;
-				let time_since_last = Date.now() / 1000 - result[result.length - 1];
-				reply = `Event luck is at ${(time_since_last / avg * 100).toFixed(2)}%.`;
-			} catch (e) {
-				console.error(e.message);
-				reply = "Error calculating luck";
-			}
-			break;
-		case "!market":
-			console.log("Getting market currency values.");
-			reply = await commands.market(msg.content.replace(/^!market ?/, ""));
-			break;
-		case "!source":
-			reply = "avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot";
-			break;
-		case "!math": case "!calc": case "!calculate":
-			reply = await commands.calculate(msg.content.replace(/^!math ?|!calc(?:ulate)? ?/, ""));
-			break;
-		case "!version":
-			try {
-				reply = await getVersion();
-			} catch (e) {
-				console.log("Error getting version: %s", e.message);
-				reply = "Error getting version.";
-			}
-			break;
-		case "!help": case "!commands": default:
-			reply = "!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate";
-		}
-	}
-	return reply;
-}
 
 const command_messages = {};
 
