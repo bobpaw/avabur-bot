@@ -301,6 +301,29 @@ describe("commands.js", function () {
 			expect(log_stub.calledWithExactly("Logged current time in events table"), "Successfully insert'd message not logged").to.be.true;
 			sql_pool.query.reset();
 		});
+		it("should return luck", async function () {
+			this.timeout(20);
+			let response = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+			let date_stub = sinon.stub(Date, "now").returns(105 * 1000);
+			sql_pool.query.returns(response.map(x => { return {"unix_timestamp(time)": x}; }));
+			await expect(commands.handle_message(message("!luck"))).to.eventually.equal("Event luck is at 50.00%.");
+			expect(log_stub.calledWithExactly("Calculating current luck.")).to.be.true;
+			date_stub.restore();
+		});
+		it("should ignore breaks of more than 6 hours", async function () {
+			this.timeout(20);
+			let response = [0, 10, 20, 30, 40, 50000, 50010, 50020, 50030, 50040, 50050];
+			let date_stub = sinon.stub(Date, "now").returns(50055 * 1000);
+			sql_pool.query.returns(response.map(x => { return { "unix_timestamp(time)": x }; }));
+			await expect(commands.handle_message(message("!luck"))).to.eventually.equal("Event luck is at 50.00%.");
+			expect(log_stub.calledWithExactly("Calculating current luck.")).to.be.true;
+			date_stub.restore();
+		});
+		it("should return error getting luck", async function () {
+			sql_pool.query.rejects(new Error("Zesty testy"));
+			await expect(commands.handle_message(message("!luck"))).to.eventually.equal("Error calculating luck");
+			expect(console_stub.calledOnceWithExactly("Zesty testy")).to.be.true;
+		});
 		it("should reply with help string", async function () {
 			await expect(commands.handle_message(message("!help"))).to.eventually.equal("!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate");
 		});
