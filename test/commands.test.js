@@ -336,6 +336,9 @@ describe("commands.js", function () {
 		it("should do some math", async function () {
 			await expect(commands.handle_message(message("!calc 40 * 32"))).to.eventually.equal("1,280");
 		});
+		it("should do some math with an alias", async function () {
+			await expect(commands.handle_message(message("!math 40 * 32"))).to.eventually.equal("1,280");
+		});
 		it("should return version", async function () {
 			await expect(commands.handle_message(message("!version"))).to.eventually.equal("Zestiest version available.");
 		});
@@ -351,6 +354,11 @@ describe("commands.js", function () {
 		});
 		it("should return nobody is selling", async function () {
 			await expect(commands.handle_message(message("!market glimmer"))).to.eventually.equal("Nobody is selling glimmer");
+		});
+		it("should be the same for all caps", async function () {
+			await expect(commands.handle_message(message("!HELP")), "Fail testing !HELP").to.eventually.equal("!luck, !market, !ping, !source, !version, !help, !commands, !math, !calc, !calculate");
+			await expect(commands.handle_message(message("!PING")), "Fail testing !PING").to.eventually.equal("pong");
+			await expect(commands.handle_message(message("!SOURCE")), "Fail testing !SOURCE").to.eventually.equal("avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot");
 		});
 	});
 });
