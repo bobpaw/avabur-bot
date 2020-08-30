@@ -13,15 +13,15 @@ const pkg_version = require("../package.json")["version"];
 
 describe("getVersion()", function () {
 	it("should return a semver or a commit hash", async function () {
-		expect(await getVersion()).to.satisfy(function (str) {
+		await expect(getVersion()).to.eventually.satisfy(function (str) {
 			return valid(str) !== null || /^[0-9a-f]{7} \(branch: (?!-)(?!.+(?:\.\.|@{).+)[^ ~^:?*[]+(?<!\.)\)$/.test(str);
 		});
 	});
 	it("should return v1.1.0", async function () {
-		expect(await getVersion("8835f11d6c00b61fc2e2a27fe9ce66653118a7bb")).to.equal("v1.1.0");
+		await expect(getVersion("8835f11d6c00b61fc2e2a27fe9ce66653118a7bb")).to.eventually.equal("v1.1.0");
 	});
 	it("should return /08a5078 \\(branch: [-_a-zA-Z0-9]+\\)/", async function () {
-		expect(await getVersion("08a507836f9b8888e9f7f4e18b0bcbc8227d39cc")).to.match(/08a5078 \(branch: [-_a-zA-Z0-9]+\)/);
+		await expect(getVersion("08a507836f9b8888e9f7f4e18b0bcbc8227d39cc")).to.eventually.match(/08a5078 \(branch: [-_a-zA-Z0-9]+\)/);
 	});
 
 	describe("should responds to exceptions", function () {
@@ -52,13 +52,13 @@ describe("getVersion()", function () {
 			let git_error = new Error("Zesty testy");
 			git_error.name = "GitError";
 			raw_stub.withArgs("describe", "--exact-match", "--tags", "HEAD").rejects(git_error);
-			expect(await get_version()).to.equal(pkg_version);
+			await expect(get_version()).to.eventually.equal(pkg_version);
 			expect(error_stub.calledWith("Git error while getting version: %s\nFalling back to npm package version.", "Zesty testy")).to.be.true;
 			raw_stub.restore();
 		});
 		it(`named GitError by returning ${pkg_version}`, async function () {
 			gitStub.throws("GitError", "Zesty testy");
-			expect(await get_version()).to.equal(pkg_version);
+			await expect(get_version()).to.eventually.equal(pkg_version);
 			expect(error_stub.calledWith("Git error while getting version: %s\nFalling back to npm package version.", "Zesty testy")).to.be.true;
 		});
 		it(`named GitResponseError by returning ${pkg_version}`, async function () {
@@ -66,12 +66,12 @@ describe("getVersion()", function () {
 			zesty.git = "Zesty testy parsed git error";
 			zesty.name = "GitResponseError";
 			gitStub.throws(zesty);
-			expect(await get_version()).to.equal(pkg_version);
+			await expect(get_version()).to.eventually.equal(pkg_version);
 			expect(error_stub.calledWith("Git error while getting version: %s\nFalling back to npm package version.", "Zesty testy parsed git error")).to.be.true;
 		});
 		it("named something else by throwing it", async function () {
 			gitStub.throws(new TypeError("Wrong Zesty"));
-			await expect(get_version()).to.be.rejectedWith(TypeError, "Wrong Zest");
+			await expect(get_version()).to.be.rejectedWith(TypeError, "Wrong Zest"); // matches substring so we're fine
 		});
 	});
 });
