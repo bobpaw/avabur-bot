@@ -33,6 +33,35 @@ module.exports = {
 		"eol-last": [
 			"error",
 			"always"
+		],
+		"block-spacing": [
+			"error",
+			"always"
+		],
+		"arrow-spacing": [
+			"error",
+			{
+				before: true,
+				after: true
+			}
+		],
+		"comma-spacing": [
+			"error",
+			{
+				before: false,
+				after: true
+			}
+		],
+		"space-before-blocks": [
+			"error",
+			"always"
+		],
+		"keyword-spacing": [
+			"error",
+			{
+				before: true,
+				after: true
+			}
 		]
 	}
 };
