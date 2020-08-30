@@ -4,6 +4,7 @@
   "description": "Provides functions to work in concert with a Notifications of Avabur webhook. !luck requires mysql, !market gets currency values, !ping replies pong",
   "main": "server.js",
   "scripts": {
+    "prepare": "node prepare-secrets.js",
     "lint": "eslint --cache --cache-location .eslintcache .",
     "lint-fix": "eslint --cache --cache-location .eslintcache --fix .",
     "pretest": "eslint --cache --cache-location .eslintcache .",
