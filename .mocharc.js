@@ -10,7 +10,7 @@ module.exports = {
   package: './package.json',
   reporter: 'spec',
   slow: 75,
-  timeout: 4000,
+  timeout: 2000,
   ui: 'bdd',
   'watch-files': ['test/**/*.js'],
   'watch-ignore': ['lib/vendor', 'node_modules']
