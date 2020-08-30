@@ -7,7 +7,7 @@ const proxyquire = require("proxyquire");
 
 const Discord = require("discord.js");
 const client = new Discord.Client();
-let login_stub = sinon.stub(client, "login");
+let login_stub = sinon.stub(client, "login").resolves("bot_token");
 client.user = { id: 1, tag: "avabur-bot#0000", username: "avabur-bot", bot: true };
 let messageStub = sinon.stub();
 client.on("message", messageStub);

@@ -44,4 +44,7 @@ client.on("messageUpdate", async (old, new_msg) => {
 	}
 });
 
-client.login(Secrets.bot_token);
+client.login(Secrets.bot_token).catch(e => {
+	console.error("Discord.js failed to login. Error: %s", e.message);
+	process.exit(1);
+});
