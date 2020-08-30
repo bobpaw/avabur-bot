@@ -78,4 +78,29 @@ describe("server.js", function () {
 		expect(login_stub.calledOnce).to.be.true;
 		expect(log_stub.calledOnceWithExactly("Logged in as avabur-bot#0000!"));
 	});
+	it("should exit on login failure", function () {
+		let exit_stub = sinon.stub(process, "exit");
+
+		// FIXME: Remove what is unnecessary and use this as a template for recreating the above proxyuire call that's probably wrong.
+		proxyquire("../server.js", {
+			"discord.js": {
+				Client: function () {
+					this.on = sinon.stub();
+					this.login = () => Promise.reject(new Error("Zesty testy")).finally(function () {
+						expect(error_stub.calledOnceWithExactly("Discord.js failed to login. Error: %s", "Zesty testy"), "console.error not called").to.be.true;
+						expect(exit_stub.calledWithExactly(1), "process.exit not called").to.be.true;
+						exit_stub.restore();
+					});
+				}
+			},
+			"./secrets": {
+				bot_token: "token",
+				sql_pass: "password"
+			},
+			"./lib/commands": {
+				"handle_command": () => { "Response"; },
+				"@noCallThru": true
+			}
+		});
+	});
 });
