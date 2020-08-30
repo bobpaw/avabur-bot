@@ -36,9 +36,7 @@ describe("getVersion()", function () {
 		beforeEach(function () {
 			gitStub = sinon.stub(other_git, "branch");
 			get_version = proxyquire("../lib/get-version.js", {
-				"simple-git": function () {
-					return other_git;
-				}
+				"simple-git": () => other_git
 			});
 		});
 		afterEach(function () {
@@ -49,11 +47,14 @@ describe("getVersion()", function () {
 			console.error.restore();
 		});
 		it(`named GitError from git describe by returning ${pkg_version}`, async function () {
-			gitStub.restore();
-			gitStub = sinon.stub(other_git, "raw");
-			gitStub.withArgs(sinon.match.array.deepEquals(["describe", "--exact-match", "--tags", "HEAD"])).throws("GitError", "Zesty testy");
+			gitStub.resolves("Response");
+			let raw_stub = sinon.stub(other_git, "raw");
+			let git_error = new Error("Zesty testy");
+			git_error.name = "GitError";
+			raw_stub.withArgs("describe", "--exact-match", "--tags", "HEAD").rejects(git_error);
 			expect(await get_version()).to.equal(pkg_version);
 			expect(error_stub.calledWith("Git error while getting version: %s\nFalling back to npm package version.", "Zesty testy")).to.be.true;
+			raw_stub.restore();
 		});
 		it(`named GitError by returning ${pkg_version}`, async function () {
 			gitStub.throws("GitError", "Zesty testy");
