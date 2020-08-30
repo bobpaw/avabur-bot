@@ -267,8 +267,9 @@ describe("commands.js", function () {
 	});
 	describe("handle_commands()", function () {
 		const sql_pool = { query: sinon.stub().resolves("") };
+		const get_version_stub = sinon.stub().resolves("Zestiest version available.");
 		const commands = proxyquire("../lib/commands", {
-			"./get-version.js": () => Promise.resolve("Zestiest version available."),
+			"./get-version.js": get_version_stub,
 			"./get-currency-prices.js": () => Promise.resolve({
 				Crystal: [
 					{ price: 17950000, amount: 536, seller: "trgKai" },
@@ -343,10 +344,8 @@ describe("commands.js", function () {
 			await expect(commands.handle_message(message("!version"))).to.eventually.equal("Zestiest version available.");
 		});
 		it("should return 'error getting version'", async function () {
-			let throw_commands = proxyquire("../lib/commands", {
-				"./get-version.js": () => Promise.reject(new Error("Gung ho!"))
-			});
-			await expect(throw_commands.handle_message(message("!version"))).to.eventually.equal("Error getting version.");
+			get_version_stub.rejects(new Error("Gung ho!"));
+			await expect(commands.handle_message(message("!version"))).to.eventually.equal("Error getting version.");
 			expect(log_stub.calledOnceWithExactly("Error getting version: %s", "Gung ho!")).to.be.true;
 		});
 		it("should return crystal market value", async function () {
