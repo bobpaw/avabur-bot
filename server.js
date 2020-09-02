@@ -1,4 +1,36 @@
 "use strict";
+
+const argv = require("yargs").options({
+	l: {
+		alias: ["log-level", "loglevel"],
+		description: "set log level",
+		string: true,
+		choices: ["trace", "debug", "info", "warn", "error"],
+		default: "warn"
+	}
+}).help().version().argv;
+
+const log = require("loglevel");
+const chalk = require("chalk");
+const prefix = require("loglevel-plugin-prefix");
+prefix.reg(log);
+
+prefix.apply(log, {
+	format: (level, name, timestamp) => {
+		const colors = {
+			trace: chalk.magenta,
+			debug: chalk.blue,
+			info: chalk.white,
+			warn: chalk.yellow,
+			error: chalk.red
+		};
+		return `${chalk.gray(timestamp)} ${colors[level.toLowerCase()](level)}${name === "root" ? "" : chalk.green(name)}:`;
+	}
+});
+
+log.setDefaultLevel(argv.loglevel); // i.e. allow Sinon or anything else to override programmatically.
+log.info(`Log level is ${argv.logLevel}`);
+
 const Secrets = require("./secrets");
 
 const Discord = require("discord.js");
