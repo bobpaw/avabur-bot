@@ -13,7 +13,7 @@ jobs:
     - os: windows
     - os: osx
     - stage: "FOSSA"
-      if: branch = master
+      if: tag IS present
       node_js: node
       before_script:
         - "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | sudo bash"
