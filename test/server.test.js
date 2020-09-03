@@ -67,6 +67,8 @@ describe("server.js", function () {
 	afterEach(function () {
 		fakeMessage.reply.reset();
 		replyMessage.edit.reset();
+		replyMessage.reply.reset();
+		replyMessage.delete.reset();
 		log_stub.reset();
 		error_stub.reset();
 	});
@@ -100,6 +102,23 @@ describe("server.js", function () {
 		expect(log_stub.notCalled).to.be.true;
 		expect(error_stub.notCalled).to.be.true;
 	});
+	it("should not reply to messages without response", async function () {
+		// This test doesn't match most realities, since handle_message usually returns "" rather than undefined
+		response_stub.resolves();
+		await call_handlers("message", fakeMessage);
+
+		expect(fakeMessage.reply.notCalled).to.be.true;
+		expect(log_stub.calledOnce).to.be.true;
+		expect(error_stub.notCalled).to.be.true;
+	});
+	it("should not reply to message where response is empty", async function () {
+		response_stub.resolves("");
+		await call_handlers("message", fakeMessage);
+
+		expect(fakeMessage.reply.notCalled).to.be.true;
+		expect(log_stub.calledOnce).to.be.true;
+		expect(error_stub.notCalled).to.be.true;
+	});
 	it("should edit its response", async function () {
 		let newMessage = {...fakeMessage};
 		response_stub.resolves("Updated response");
@@ -124,6 +143,16 @@ describe("server.js", function () {
 
 		expect(replyMessage.delete.calledOnce).to.be.true;
 		expect(log_stub.calledWithExactly("Deleting message 8")).to.be.true;
+	});
+	it("should do nothing to message edits that are not now commands", async function () {
+		response_stub.resolves();
+		await call_handlers("messageUpdate", fakeMessage, fakeMessage);
+
+		expect(replyMessage.edit.notCalled, "Edit was called").to.be.true;
+		expect(replyMessage.reply.notCalled, "Reply was called").to.be.true;
+		expect(replyMessage.delete.notCalled, "Delete was called").to.be.true;
+		expect(log_stub.calledOnce, "console.log was called").to.be.true;
+		expect(error_stub.notCalled, "console.error was called").to.be.true;
 	});
 	it("should reply to messages with a new response", async function () {
 		response_stub.resolves("An interesting new response");
