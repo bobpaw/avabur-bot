@@ -20,8 +20,8 @@ describe("getVersion()", function () {
 	it("should return v1.1.0", async function () {
 		await expect(getVersion("8835f11d6c00b61fc2e2a27fe9ce66653118a7bb")).to.eventually.equal("v1.1.0");
 	});
-	it("should return /08a5078 \\(branch: [-_a-zA-Z0-9]+\\)/", async function () {
-		await expect(getVersion("08a507836f9b8888e9f7f4e18b0bcbc8227d39cc")).to.eventually.match(/08a5078 \(branch: [-_a-zA-Z0-9]+\)/);
+	it("should return /08a5078 \\(branch: (?:[-_a-zA-Z0-9]+)?\\)/", async function () {
+		await expect(getVersion("08a507836f9b8888e9f7f4e18b0bcbc8227d39cc")).to.eventually.match(/08a5078 \(branch: (?:[-_a-zA-Z0-9]+\))?/);
 	});
 
 	describe("should responds to exceptions", function () {
