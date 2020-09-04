@@ -117,7 +117,7 @@ describe("commands.js", function () {
 	});
 	describe("market()", function () {
 		const commands = proxyquire("../lib/commands", {
-			"./get-currency-prices": async () => await market_response
+			"./get-currency-prices": () => market_response
 		});
 		it("should return 17,950,000", async function () {
 			await expect(commands.market("crystals")).to.eventually.equal("Crystal: 17,950,000");
@@ -243,7 +243,7 @@ describe("commands.js", function () {
 			let throw_commands;
 			beforeEach(function () {
 				throw_commands = proxyquire("../lib/commands", {
-					"./get-currency-prices": async () => { await throw_stub(); }
+					"./get-currency-prices": throw_stub
 				});
 			});
 			afterEach(function () {
@@ -266,11 +266,11 @@ describe("commands.js", function () {
 		});
 	});
 	describe("handle_commands()", function () {
-		const sql_pool = { query: sinon.stub().resolves("") };
-		const get_version_stub = sinon.stub().resolves("Zestiest version available.");
+		const sql_pool = { query: sinon.stub().returns("") };
+		const get_version_stub = sinon.stub().returns("Zestiest version available.");
 		const commands = proxyquire("../lib/commands", {
 			"./get-version.js": get_version_stub,
-			"./get-currency-prices.js": () => Promise.resolve({
+			"./get-currency-prices.js": () => new Object({
 				Crystal: [
 					{ price: 17950000, amount: 536, seller: "trgKai" },
 					{ price: 18175000, amount: 12, seller: "pok" }
@@ -289,7 +289,16 @@ describe("commands.js", function () {
 			content: text,
 			reply: sinon.stub()
 		});
-		it("should reply nothing", async function () {
+		it("should reply nothing with no message object", async function () {
+			await expect(commands.handle_message()).to.eventually.equal("");
+		});
+		it("should reply nothing with no message content", async function () {
+			await expect(commands.handle_message(message())).to.eventually.equal("");
+		});
+		it("should reply nothing with empty message content", async function () {
+			await expect(commands.handle_message(message(""))).to.eventually.equal("");
+		});
+		it("should reply nothing with non-command", async function () {
 			await expect(commands.handle_message(message("jerry"))).to.eventually.equal("");
 		});
 		it("should query MySQL server", async function () {
