@@ -20,7 +20,11 @@ module.exports = {
 		],
 		"quotes": [
 			"error",
-			"double"
+			"double",
+			{
+				avoidEscape: true,
+				allowTemplateLiterals: true
+			}
 		],
 		"quote-props": [
 			"error",
