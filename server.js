@@ -1,3 +1,9 @@
+/**
+ * @file Connects to the Discord API.
+ * @author Aiden Woodruff <aiden.woodruff@gmail.com>
+ * @license MIT
+ */
+
 "use strict";
 
 const argv = require("yargs").options({

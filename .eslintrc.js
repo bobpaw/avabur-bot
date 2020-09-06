@@ -73,7 +73,7 @@ module.exports = {
 		],
 		"jsdoc/check-access": "error",
 		"jsdoc/check-alignment": "error", // Recommended
-		"jsdoc/check-examples": "off", // It's sort of broken right now
+		"jsdoc/check-examples": "warn",
 		"jsdoc/check-indentation": "error",
 		"jsdoc/check-param-names": "error", // Recommended
 		"jsdoc/check-syntax": "error",
@@ -105,7 +105,7 @@ module.exports = {
 		"jsdoc/require-returns-description": "error", // Recommended
 		"jsdoc/require-returns-type": "error", // Recommended
 		"jsdoc/require-throws": "error",
-		"jsdoc/valid-types": "error" // Recommended
+		"jsdoc/valid-types": 0 // Recommended; Broken rn
 	},
 	overrides: [
 		{

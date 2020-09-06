@@ -1,3 +1,9 @@
+/**
+ * @file Installs a secrets.js file if it does not exist.
+ * @author Aiden Woodruff <aiden.woodruff@gmail.com>
+ * @license MIT
+ */
+
 const fs = require("fs");
 
 fs.access("secrets.js", function (err) {
