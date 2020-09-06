@@ -10,6 +10,7 @@ module.exports = {
 		ecmaVersion: 11
 	},
 	plugins: [
+		"markdown",
 		"jsdoc"
 	],
 	ignorePatterns: ["out/"],
@@ -73,7 +74,12 @@ module.exports = {
 		],
 		"jsdoc/check-access": "error",
 		"jsdoc/check-alignment": "error", // Recommended
-		"jsdoc/check-examples": "warn",
+		"jsdoc/check-examples": [
+			"warn",
+			{
+				matchingFileName: "example.md"
+			}
+		],
 		"jsdoc/check-indentation": "error",
 		"jsdoc/check-param-names": "error", // Recommended
 		"jsdoc/check-syntax": "error",
@@ -124,6 +130,23 @@ module.exports = {
 				"jsdoc/require-property-type": 0, "jsdoc/require-returns": 0, "jsdoc/require-returns-check": 0,
 				"jsdoc/require-returns-description": 0, "jsdoc/require-returns-type": 0,
 				"jsdoc/require-throws": 0, "jsdoc/valid-types": 0
+			}
+		},
+		{
+			files: ["**/*.md"],
+			parserOptions: {
+				ecmaFeatures: {
+					impliedStrict: true
+				}
+			},
+			rules: {
+				"no-undef": "off",
+				"no-unused-vars": "off",
+				"no-console": "off",
+				"padded-blocks": "off",
+				"strict": "off",
+				"linebreak-style": "off",
+				"jsdoc/require-file-overview": "off"
 			}
 		}
 	]
