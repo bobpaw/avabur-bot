@@ -15,10 +15,7 @@ module.exports = {
 	],
 	ignorePatterns: ["out/"],
 	rules: {
-		"indent": [
-			"error",
-			"tab"
-		],
+		"indent": ["error", "tab"],
 		"linebreak-style": [
 			"error",
 			(require("os").EOL === "\r\n" ? "windows" : "unix")
@@ -31,22 +28,10 @@ module.exports = {
 				allowTemplateLiterals: true
 			}
 		],
-		"quote-props": [
-			"error",
-			"consistent-as-needed"
-		],
-		"semi": [
-			"error",
-			"always"
-		],
-		"eol-last": [
-			"error",
-			"always"
-		],
-		"block-spacing": [
-			"error",
-			"always"
-		],
+		"quote-props": ["error", "consistent-as-needed"],
+		"semi": ["error", "always"],
+		"eol-last": ["error", "always"],
+		"block-spacing": ["error", "always"],
 		"arrow-spacing": [
 			"error",
 			{
@@ -61,10 +46,7 @@ module.exports = {
 				after: true
 			}
 		],
-		"space-before-blocks": [
-			"error",
-			"always"
-		],
+		"space-before-blocks": ["error", "always"],
 		"keyword-spacing": [
 			"error",
 			{
@@ -72,14 +54,13 @@ module.exports = {
 				after: true
 			}
 		],
+		"object-curly-spacing": [
+			"error",
+			"always"
+		],
 		"jsdoc/check-access": "error",
 		"jsdoc/check-alignment": "error", // Recommended
-		"jsdoc/check-examples": [
-			"warn",
-			{
-				matchingFileName: "example.md"
-			}
-		],
+		"jsdoc/check-examples": ["warn", { matchingFileName: "example.md" }],
 		"jsdoc/check-indentation": "error",
 		"jsdoc/check-param-names": "error", // Recommended
 		"jsdoc/check-syntax": "error",
@@ -134,11 +115,7 @@ module.exports = {
 		},
 		{
 			files: ["**/*.md"],
-			parserOptions: {
-				ecmaFeatures: {
-					impliedStrict: true
-				}
-			},
+			parserOptions: { ecmaFeatures: { impliedStrict: true } },
 			rules: {
 				"no-undef": "off",
 				"no-unused-vars": "off",
