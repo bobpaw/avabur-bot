@@ -120,7 +120,7 @@ describe("server.js", function () {
 		expect(error_stub.notCalled).to.be.true;
 	});
 	it("should edit its response", async function () {
-		let newMessage = {...fakeMessage};
+		let newMessage = { ...fakeMessage };
 		response_stub.resolves("Updated response");
 		replyMessage.edit.resolves(replyMessage);
 		await call_handlers("messageUpdate", fakeMessage, newMessage);
