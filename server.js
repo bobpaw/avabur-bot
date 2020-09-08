@@ -2,6 +2,7 @@
  * @file Connects to the Discord API.
  * @author Aiden Woodruff <aiden.woodruff@gmail.com>
  * @license MIT
+ * @requires lib/commands
  */
 
 "use strict";
