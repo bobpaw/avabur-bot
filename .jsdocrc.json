@@ -1,0 +1,22 @@
+{
+  "opts": {
+    "recurse": true
+  },
+  "plugins": [],
+  "recurseDepth": 10,
+  "source": {
+    "include": ["server.js", "prepare-secrets.js", "lib"],
+      "includePattern": ".+\\.js(doc|x)?$",
+      "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "sourceType": "module",
+  "tags": {
+      "allowUnknownTags": true,
+      "dictionaries": ["jsdoc"]
+  },
+  "templates": {
+      "cleverLinks": true,
+      "monospaceLinks": false
+  }
+}
+
