@@ -75,7 +75,7 @@ module.exports = {
 		"jsdoc/no-undefined-types": "error", // Recommended
 		"jsdoc/require-description": "error",
 		"jsdoc/require-description-complete-sentence": "warn",
-		"jsdoc/require-example": "warn",
+		"jsdoc/require-example": ["error", { exemptNoArguments: true }],
 		"jsdoc/require-file-overview": "warn",
 		"jsdoc/require-hyphen-before-param-description": "off",
 		"jsdoc/require-jsdoc": "warn", // Recommended
