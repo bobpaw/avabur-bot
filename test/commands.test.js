@@ -200,8 +200,14 @@ describe("commands.js", function () {
 		it("should return 16", async function () {
 			await expect(commands.calculate("4 * 4")).to.eventually.equal("16");
 		});
+		it("should return 0", async function () {
+			await expect(commands.calculate(`summ("x", "x", 4, 4)`)).to.eventually.equal("0");
+		});
 		it("should return 10", async function () {
 			await expect(commands.calculate(`summ("x", "x", 1, 4)`)).to.eventually.equal("10");
+		});
+		it("should return -10", async function () {
+			await expect(commands.calculate(`summ("x", "x", 4, 1)`)).to.eventually.equal("-10");
 		});
 		it("should return 0", async function () {
 			await expect(commands.calculate("units(cry, 0)")).to.eventually.equal("0");
