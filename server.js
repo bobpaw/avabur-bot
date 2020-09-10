@@ -7,6 +7,8 @@
 
 "use strict";
 
+/*
+// Not yet implemented
 const argv = require("yargs").options({
 	l: {
 		alias: ["log-level", "loglevel"],
@@ -37,6 +39,7 @@ prefix.apply(log, {
 
 log.setDefaultLevel(argv.loglevel); // i.e. allow Sinon or anything else to override programmatically.
 log.info(`Log level is ${argv.logLevel}`);
+*/
 
 const Secrets = require("./secrets");
 
