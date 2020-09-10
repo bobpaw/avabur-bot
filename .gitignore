@@ -114,3 +114,6 @@ dist
 
 # Secrets file
 secrets.js
+
+# JSDoc output
+out/
