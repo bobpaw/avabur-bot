@@ -23,7 +23,9 @@ Gathers event data if you have a [Notifications of Avabur](https://github.com/da
  * `!math`, `!calc`, `!calculate` Calculates arbitary math expressions
    - Uses [Math.js](https://mathjs.org/) for the legwork
    - Resolves numeric literals like `100k` to `100,000` (Supports T, B, M, and K and is is case-insensitive)
-   - Includes `units(c,n)` function that calculates the price of `n`-units of `c` currency (of the 10 supported by [roa-apis](https://github.com/edvordo/roa-apis/blob/master/market-currency.md)). Each of them have shortened variables and single character shortcuts.
+   - Includes `units(c, n)` function that calculates the price of `n`-units of `c` currency (of the 10 supported by [roa-apis](https://github.com/edvordo/roa-apis/blob/master/market-currency.md)). Each of them have shortened variables and single character shortcuts.
+   - Includes `max_units(c, n)` function that calculates the maximum number of `c` currency that can be bought using `n` gold.
+   - Includes `summ(expr, var, begin, end)` which evaluates summations. These summations cannot include references to currency prices.
  * `!version` Responds with the release tag (if there is one), commit hash (if the branch is experimental), or branch name
  * `!help`, `!commands` Replies with a list of commands
 
