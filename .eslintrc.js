@@ -5,7 +5,10 @@ module.exports = {
 		es2020: true,
 		mocha: true
 	},
-	extends: "eslint:recommended",
+	extends: [
+		"eslint:recommended",
+		"plugin:markdown/recommended"
+	],
 	parserOptions: {
 		ecmaVersion: 11
 	},
@@ -115,13 +118,13 @@ module.exports = {
 		},
 		{
 			files: ["**/*.md"],
-			parserOptions: { ecmaFeatures: { impliedStrict: true } },
+			parser: "markdown/markdown"
+		},
+		{
+			files: ["**/*.md/*.js"],
+
 			rules: {
-				"no-undef": "off",
-				"no-unused-vars": "off",
 				"no-console": "off",
-				"padded-blocks": "off",
-				"strict": "off",
 				"linebreak-style": "off",
 				"jsdoc/require-file-overview": "off"
 			}
