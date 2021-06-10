@@ -118,7 +118,7 @@ module.exports = {
 		},
 		{
 			files: ["**/*.md"],
-			parser: "markdown/markdown"
+			processor: "markdown/markdown"
 		},
 		{
 			files: ["**/*.md/*.js"],
