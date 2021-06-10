@@ -7,7 +7,8 @@ module.exports = {
 	},
 	extends: [
 		"eslint:recommended",
-		"plugin:markdown/recommended"
+		"plugin:markdown/recommended",
+		"plugin:jsdoc/recommended"
 	],
 	parserOptions: {
 		ecmaVersion: 11
@@ -62,38 +63,37 @@ module.exports = {
 			"always"
 		],
 		"jsdoc/check-access": "error",
-		"jsdoc/check-alignment": "error", // Recommended
+		"jsdoc/check-alignment": "error",
 		"jsdoc/check-examples": ["warn", { matchingFileName: "example.md" }],
 		"jsdoc/check-indentation": "error",
-		"jsdoc/check-param-names": "error", // Recommended
+		"jsdoc/check-param-names": "error",
 		"jsdoc/check-syntax": "error",
-		"jsdoc/check-tag-names": "error", // Recommended
-		"jsdoc/check-types": "error", // Recommended
+		"jsdoc/check-tag-names": "error",
+		"jsdoc/check-types": "error",
 		"jsdoc/empty-tags": "error",
-		"jsdoc/implements-on-classes": "error", // Recommended
+		"jsdoc/implements-on-classes": "error",
 		"jsdoc/match-description": "off",
-		"jsdoc/newline-after-description": "error", // Recommended
+		"jsdoc/newline-after-description": "error",
 		"jsdoc/no-bad-blocks": "error",
 		"jsdoc/no-types": "off", // Only 1 if using TypeScript
-		"jsdoc/no-undefined-types": "error", // Recommended
+		"jsdoc/no-undefined-types": "error",
 		"jsdoc/require-description": "error",
 		"jsdoc/require-description-complete-sentence": "warn",
 		"jsdoc/require-example": ["error", { exemptNoArguments: true }],
 		"jsdoc/require-file-overview": "warn",
 		"jsdoc/require-hyphen-before-param-description": "off",
-		"jsdoc/require-jsdoc": "warn", // Recommended
-		"jsdoc/require-param": "error", // Recommended
-		"jsdoc/require-param-description": "error", // Recommended
-		"jsdoc/require-param-name": "error", // Recommended
-		"jsdoc/require-param-type": "error", // Recommended
+		"jsdoc/require-param": "error",
+		"jsdoc/require-param-description": "error",
+		"jsdoc/require-param-name": "error",
+		"jsdoc/require-param-type": "error",
 		"jsdoc/require-property": "error",
 		"jsdoc/require-property-description": "error",
 		"jsdoc/require-property-name": "error",
 		"jsdoc/require-property-type": "error",
-		"jsdoc/require-returns": "error", // Recommended
-		"jsdoc/require-returns-check": "error", // Recommended
-		"jsdoc/require-returns-description": "error", // Recommended
-		"jsdoc/require-returns-type": "error", // Recommended
+		"jsdoc/require-returns": "error",
+		"jsdoc/require-returns-check": "error",
+		"jsdoc/require-returns-description": "error",
+		"jsdoc/require-returns-type": "error",
 		"jsdoc/require-throws": "error",
 		"jsdoc/valid-types": 0 // Recommended; Broken rn
 	},
