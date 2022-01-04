@@ -1,36 +1,35 @@
-module.exports = {
-	env: {
-		node: true,
-		commonjs: true,
-		es2020: true,
-		mocha: true
+{
+	"env": {
+		"node": true,
+		"es2020": true,
+		"mocha": true
 	},
-	extends: [
+	"extends": [
 		"eslint:recommended",
 		"plugin:markdown/recommended",
 		"plugin:jsdoc/recommended"
 	],
-	parserOptions: {
-		ecmaVersion: 11,
-		sourceType: "module"
+	"parserOptions": {
+		"ecmaVersion": 11,
+		"sourceType": "module"
 	},
-	plugins: [
+	"plugins": [
 		"markdown",
 		"jsdoc"
 	],
-	ignorePatterns: ["out/"],
-	rules: {
+	"ignorePatterns": ["out/"],
+	"rules": {
 		"indent": ["error", "tab"],
 		"linebreak-style": [
 			"error",
-			(require("os").EOL === "\r\n" ? "windows" : "unix")
+			"unix"
 		],
 		"quotes": [
 			"error",
 			"double",
 			{
-				avoidEscape: true,
-				allowTemplateLiterals: true
+				"avoidEscape": true,
+				"allowTemplateLiterals": true
 			}
 		],
 		"quote-props": ["error", "consistent-as-needed"],
@@ -40,23 +39,23 @@ module.exports = {
 		"arrow-spacing": [
 			"error",
 			{
-				before: true,
-				after: true
+				"before": true,
+				"after": true
 			}
 		],
 		"comma-spacing": [
 			"error",
 			{
-				before: false,
-				after: true
+				"before": false,
+				"after": true
 			}
 		],
 		"space-before-blocks": ["error", "always"],
 		"keyword-spacing": [
 			"error",
 			{
-				before: true,
-				after: true
+				"before": true,
+				"after": true
 			}
 		],
 		"object-curly-spacing": [
@@ -65,7 +64,7 @@ module.exports = {
 		],
 		"jsdoc/check-access": "error",
 		"jsdoc/check-alignment": "error",
-		"jsdoc/check-examples": ["warn", { matchingFileName: "example.md" }],
+		"jsdoc/check-examples": ["warn", { "matchingFileName": "example.md" }],
 		"jsdoc/check-indentation": "error",
 		"jsdoc/check-param-names": "error",
 		"jsdoc/check-syntax": "error",
@@ -80,7 +79,7 @@ module.exports = {
 		"jsdoc/no-undefined-types": "error",
 		"jsdoc/require-description": "error",
 		"jsdoc/require-description-complete-sentence": "warn",
-		"jsdoc/require-example": ["error", { exemptNoArguments: true }],
+		"jsdoc/require-example": ["error", { "exemptNoArguments": true }],
 		"jsdoc/require-file-overview": "warn",
 		"jsdoc/require-hyphen-before-param-description": "off",
 		"jsdoc/require-param": "error",
@@ -98,10 +97,10 @@ module.exports = {
 		"jsdoc/require-throws": "error",
 		"jsdoc/valid-types": 0 // Recommended; Broken rn
 	},
-	overrides: [
+	"overrides": [
 		{
-			files: ["*.test.js", ".eslintrc.js"],
-			rules: {
+			"files": ["*.test.js", ".eslintrc.js"],
+			"rules": {
 				"jsdoc/check-access": 0, "jsdoc/check-alignment": 0, "jsdoc/check-examples": 0,
 				"jsdoc/check-indentation": 0, "jsdoc/check-param-names": 0, "jsdoc/check-syntax": 0,
 				"jsdoc/check-tag-names": 0, "jsdoc/check-types": 0, "jsdoc/empty-tags": 0,
@@ -118,17 +117,17 @@ module.exports = {
 			}
 		},
 		{
-			files: ["**/*.md"],
-			processor: "markdown/markdown"
+			"files": ["**/*.md"],
+			"processor": "markdown/markdown"
 		},
 		{
-			files: ["**/*.md/*.js"],
+			"files": ["**/*.md/*.js"],
 
-			rules: {
+			"rules": {
 				"no-console": "off",
 				"linebreak-style": "off",
 				"jsdoc/require-file-overview": "off"
 			}
 		}
 	]
-};
+}
