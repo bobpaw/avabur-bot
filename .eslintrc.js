@@ -11,7 +11,8 @@ module.exports = {
 		"plugin:jsdoc/recommended"
 	],
 	parserOptions: {
-		ecmaVersion: 11
+		ecmaVersion: 11,
+		sourceType: "module"
 	},
 	plugins: [
 		"markdown",

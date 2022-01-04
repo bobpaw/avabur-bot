@@ -41,12 +41,12 @@ log.setDefaultLevel(argv.loglevel); // i.e. allow Sinon or anything else to over
 log.info(`Log level is ${argv.logLevel}`);
 */
 
-const Secrets = require("./secrets");
+import Secrets from "./secrets";
 
-const Discord = require("discord.js");
+import Discord from "discord.js";
 const client = new Discord.Client();
 
-const { handle_message } = require("./lib/commands.js");
+import { handle_message } from "./lib/commands.js";
 
 client.on("ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`);

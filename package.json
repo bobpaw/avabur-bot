@@ -2,6 +2,7 @@
   "name": "avabur-bot",
   "version": "1.4.1",
   "description": "Provides functions to work in concert with a Notifications of Avabur webhook. !luck requires mysql, !market gets currency values, !ping replies pong",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "prepare": "node prepare-secrets.js",
@@ -27,13 +28,13 @@
   },
   "homepage": "https://github.com/bobpaw/avabur-bot#readme",
   "dependencies": {
-    "chalk": "^4.1.0",
-    "discord.js": "^12.3.1",
+    "chalk": "^5.0.0",
+    "discord.js": "^13.5.0",
     "loglevel": "^1.7.0",
     "loglevel-plugin-prefix": "^0.8.4",
     "mathjs": "^7.5.1",
     "mysql": "^2.18.1",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.0",
     "simple-git": "^2.20.1",
     "yargs": "^15.4.1"
   },
@@ -45,7 +46,7 @@
     "eslint-plugin-jsdoc": "^30.4.0",
     "eslint-plugin-markdown": "^2.2.0",
     "jsdoc": "^3.6.5",
-    "mocha": "^8.4.0",
+    "mocha": "^9.1.3",
     "nodemon": "^2.0.4",
     "nyc": "^15.1.0",
     "proxyquire": "^2.1.3",
