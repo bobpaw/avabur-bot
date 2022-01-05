@@ -1,9 +1,10 @@
-const chai = require("chai");
-const chaiAsPromised = require("chai-as-promised");
+import chai from "chai";
+import chaiAsPromised from "chai-as-promised";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
-const sinon = require("sinon");
-const proxyquire = require("proxyquire");
+
+import sinon from "sinon";
+import proxyquire from "proxyquire";
 
 const event_handlers = {};
 async function call_handlers (event, ...args) {

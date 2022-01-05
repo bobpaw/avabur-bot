@@ -1,9 +1,10 @@
-const chai = require("chai");
-const chaiAsPromised = require("chai-as-promised");
+import chai from "chai";
+import chaiAsPromised from "chai-as-promised";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
-const proxyquire = require("proxyquire");
-const sinon = require("sinon");
+
+import proxyquire from "proxyquire";
+import sinon from "sinon";
 
 const market_response = {
 	"Crystal": [

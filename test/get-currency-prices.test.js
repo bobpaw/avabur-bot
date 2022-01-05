@@ -1,6 +1,6 @@
-const { expect } = require("chai");
-const sinon = require("sinon");
-const proxyquire = require("proxyquire");
+import expect from "chai";
+import sinon from "sinon";
+import proxyquire from "proxyquire";
 
 describe("get_currency_prices()", function () {
 	let fetch_stub = sinon.stub();

@@ -1,15 +1,24 @@
-const chai = require("chai");
-const chaiAsPromised = require("chai-as-promised");
+import chai from "chai";
+import chaiAsPromised from "chai-as-promised";
 chai.use(chaiAsPromised);
-const expect = chai.expect;
-const sinon = require("sinon");
 
-const valid = require("semver/functions/valid");
-const getVersion = require("../lib/get-version.js");
-const SimpleGit = require("simple-git");
+const expect = chai.expect;
+import sinon from "sinon";
+
+import valid from "semver/functions/valid";
+import getVersion from "../lib/get-version.js";
+import SimpleGit from "simple-git";
 
 const proxyquire = require("proxyquire");
-const pkg_version = require("../package.json")["version"];
+
+import { readFileSync } from "fs";
+
+const pkg_version = JSON.parse(
+	readFileSync(
+		new URL("../package.json", import.meta.url)
+	)
+)["version"];
+
 
 describe("getVersion()", function () {
 	it("should return a semver or a commit hash", async function () {

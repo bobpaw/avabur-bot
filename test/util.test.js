@@ -1,6 +1,6 @@
-const { expect } = require("chai");
+import { expect } from "chai";
 
-const { add_commas, remove_commas, expand_numeric_literals } = require("../lib/util.js");
+import { add_commas, remove_commas, expand_numeric_literals } from "../lib/util.js";
 
 describe("util.js", function () {
 	// add_commas from "util.js"
