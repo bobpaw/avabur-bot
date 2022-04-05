@@ -321,7 +321,7 @@ describe("commands.js", function () {
 			sql_pool.query.reset();
 		});
 		it("should return luck", async function () {
-			this.timeout(20);
+			this.timeout(30);
 			let response = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 			let date_stub = sinon.stub(Date, "now").returns(105 * 1000);
 			sql_pool.query.returns(response.map(x => { return { "unix_timestamp(time)": x }; }));
