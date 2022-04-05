@@ -5,11 +5,13 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 import sinon from "sinon";
 
-import valid from "semver/functions/valid";
-import getVersion from "../lib/get-version.js";
-import SimpleGit from "simple-git";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 
-const proxyquire = require("proxyquire");
+const valid = require("semver/functions/valid");
+
+import getVersion from "../lib/get-version.js";
+import * as SimpleGit from "simple-git";
 
 import { readFileSync } from "fs";
 
@@ -34,26 +36,24 @@ describe("getVersion()", function () {
 	});
 
 	describe("should responds to exceptions", function () {
-		let other_git = SimpleGit();
+		let other_git = SimpleGit.default();
 		let gitStub;
 		let get_version;
 		let error_stub;
 
 		before(function () {
 			error_stub = sinon.stub(console, "error");
-		});
-		beforeEach(function () {
 			gitStub = sinon.stub(other_git, "branch");
-			get_version = proxyquire("../lib/get-version.js", {
-				"simple-git": () => other_git
-			});
+			sinon.stub(SimpleGit, "default").returns(other_git);
 		});
 		afterEach(function () {
-			gitStub.restore();
+			gitStub.reset();
 			error_stub.resetHistory();
 		});
 		after(function () {
 			console.error.restore();
+			gitStub.restore();
+			SimpleGit.default.restore();
 		});
 		it(`named GitError from git describe by returning ${pkg_version}`, async function () {
 			gitStub.resolves("Response");

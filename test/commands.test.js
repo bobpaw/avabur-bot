@@ -3,8 +3,10 @@ import chaiAsPromised from "chai-as-promised";
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-import proxyquire from "proxyquire";
 import sinon from "sinon";
+
+import * as get_currency_prices from "../lib/get-currency-prices.js";
+import * as commands from "../lib/commands.js";
 
 const market_response = {
 	"Crystal": [
@@ -103,23 +105,30 @@ const market_response = {
 };
 
 describe("commands.js", function () {
-	let console_stub, log_stub;
+	let console_stub, log_stub, market_stub;
 	before(function () {
 		console_stub = sinon.stub(console, "error");
 		log_stub = sinon.stub(console, "log");
+		market_stub = sinon.stub(get_currency_prices, "default");
 	});
 	afterEach(function () {
 		console_stub.resetHistory();
 		log_stub.resetHistory();
+		market_stub.resetHistory();
 	});
 	after(function () {
 		console.error.restore();
 		console.log.restore();
+		market_stub.restore();
 	});
 	describe("market()", function () {
-		const commands = proxyquire("../lib/commands", {
-			"./get-currency-prices": () => market_response
+		before(function () {
+			market_stub.resolves(market_response);
 		});
+		after(function () {
+			market_stub.reset();
+		});
+
 		it("should return 17,950,000", async function () {
 			await expect(commands.market("crystals")).to.eventually.equal("Crystal: 17,950,000");
 		});
@@ -162,36 +171,33 @@ describe("commands.js", function () {
 			await expect(commands.market("Glimmer")).to.eventually.equal("Nobody is selling Glimmer");
 		});
 		describe("should respond to errors named:", function () {
-			let throw_stub = sinon.stub();
-			let throw_commands;
-			beforeEach(function () {
-				throw_commands = proxyquire("../lib/commands", {
-					"./get-currency-prices": async () => { await throw_stub(); }
-				});
-			});
 			afterEach(function () {
-				throw_stub = sinon.stub();
+				market_stub.resetBehavior();
 			});
 			it("AbortError by returning 'Fetch aborted while trying to get currency prices.'", async function () {
-				throw_stub.throws("AbortError", "Zesty testy");
-				await expect(throw_commands.market("frag")).to.eventually.equal("Fetch aborted while trying to get currency prices.");
+				market_stub.throws("AbortError", "Zesty testy");
+				await expect(commands.market("frag")).to.eventually.equal("Fetch aborted while trying to get currency prices.");
 				expect(console_stub.calledOnceWith("Fetch aborted while trying to get currency prices.")).to.be.true;
 			});
 			it("FetchError by returning 'Error fetching currency prices'", async function () {
-				throw_stub.throws("FetchError", "Zesty testy");
-				await expect(throw_commands.market("frag")).to.eventually.equal("Error fetching currency prices.");
+				market_stub.throws("FetchError", "Zesty testy");
+				await expect(commands.market("frag")).to.eventually.equal("Error fetching currency prices.");
 				expect(console_stub.calledOnceWith("Error getting currency prices: %s", "Zesty testy")).to.be.true;
 			});
 			it("something else by throwing it", async function () {
-				throw_stub.throws(new TypeError("Zesty testy"));
-				await expect(throw_commands.market("frag")).to.be.rejectedWith(TypeError, "Zesty testy");
+				market_stub.throws(new TypeError("Zesty testy"));
+				await expect(commands.market("frag")).to.be.rejectedWith(TypeError, "Zesty testy");
 			});
 		});
 	});
 	describe("calculate()", function () {
-		const commands = proxyquire("../lib/commands", {
-			"./get-currency-prices": async () => await market_response
+		before(function () {
+			market_stub.resolves(market_response);
 		});
+		after(function () {
+			market_stub.reset();
+		});
+
 		it("should return ''", async function () {
 			await expect(commands.calculate()).to.eventually.equal("");
 		});
@@ -249,35 +255,29 @@ describe("commands.js", function () {
 			});
 		});
 		describe("should respond to errors named:", function () {
-			let throw_stub = sinon.stub();
-			let throw_commands;
-			beforeEach(function () {
-				throw_commands = proxyquire("../lib/commands", {
-					"./get-currency-prices": throw_stub
-				});
-			});
 			afterEach(function () {
-				throw_stub = sinon.stub();
+				market_stub.resetBehavior();
 			});
 			it("AbortError by returning 'Fetch aborted while trying to get currency prices.'", async function () {
-				throw_stub.throws("AbortError", "Zesty testy");
-				await expect(throw_commands.calculate("units(frag, 1)")).to.eventually.equal("Fetch aborted while trying to get currency prices.");
+				market_stub.throws("AbortError", "Zesty testy");
+				await expect(commands.calculate("units(frag, 1)")).to.eventually.equal("Fetch aborted while trying to get currency prices.");
 				expect(console_stub.calledOnceWith("Fetch aborted while trying to get currency prices.")).to.be.true;
 			});
 			it("FetchError by returning 'Error fetching currency prices'", async function () {
-				throw_stub.throws("FetchError", "Zesty testy");
-				await expect(throw_commands.calculate("units(frag, 1)")).to.eventually.equal("Error fetching currency prices.");
+				market_stub.throws("FetchError", "Zesty testy");
+				await expect(commands.calculate("units(frag, 1)")).to.eventually.equal("Error fetching currency prices.");
 				expect(console_stub.calledOnceWith("Error getting currency prices: %s", "Zesty testy")).to.be.true;
 			});
 			it("something else by throwing it", async function () {
-				throw_stub.throws(new TypeError("Zesty testy"));
-				await expect(throw_commands.calculate("units(frag, 1)")).to.be.rejectedWith(TypeError, "Zesty testy");
+				market_stub.throws(new TypeError("Zesty testy"));
+				await expect(commands.calculate("units(frag, 1)")).to.be.rejectedWith(TypeError, "Zesty testy");
 			});
 		});
 	});
-	describe("handle_commands()", function () {
+	/*describe("handle_commands()") (function () {
 		const sql_pool = { query: sinon.stub().returns("") };
 		const get_version_stub = sinon.stub().returns("Zestiest version available.");
+		let proxyquire = () => {};
 		const commands = proxyquire("../lib/commands", {
 			"./get-version.js": get_version_stub,
 			"./get-currency-prices.js": () => new Object({
@@ -378,5 +378,5 @@ describe("commands.js", function () {
 			await expect(commands.handle_message(message("!PING")), "Fail testing !PING").to.eventually.equal("pong");
 			await expect(commands.handle_message(message("!SOURCE")), "Fail testing !SOURCE").to.eventually.equal("avabur-bot by extrafox45#9230 https://github.com/bobpaw/avabur-bot");
 		});
-	});
+	});*/
 });

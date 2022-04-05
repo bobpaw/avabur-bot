@@ -4,7 +4,9 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 import sinon from "sinon";
-import proxyquire from "proxyquire";
+
+import Secrets from "../secrets.js";
+import Discord from "Discord.js";
 
 const event_handlers = {};
 async function call_handlers (event, ...args) {
@@ -38,6 +40,15 @@ describe("server.js", function () {
 		}
 	});
 
+	const clientStub = sinon.createStubInstance(Discord.Client, {
+		login: login_stub,
+		user: this_user,
+		on: function (event, handler) {
+			if (!(event in event_handlers)) event_handlers[event] = [];
+			event_handlers[event].push(handler);
+		}
+	});
+
 	let fakeMessage = {
 		id: 7,
 		author: { id: 13, tag: "Wumpus#0000", username: "Wumpus", bot: false },
@@ -61,6 +72,7 @@ describe("server.js", function () {
 	before(function () {
 		log_stub = sinon.stub(console, "log");
 		error_stub = sinon.stub(console, "error");
+		
 	});
 	beforeEach(function () {
 		fakeMessage.content = "";

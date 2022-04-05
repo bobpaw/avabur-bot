@@ -1,15 +1,14 @@
 import expect from "chai";
 import sinon from "sinon";
-import proxyquire from "proxyquire";
+
+import * as fetch from "node-fetch";
 
 describe("get_currency_prices()", function () {
-	let fetch_stub = sinon.stub();
+	let fetch_stub;
 	let get_currency_prices;
 
 	before(function () {
-		get_currency_prices = proxyquire("../lib/get-currency-prices.js", {
-			"node-fetch": fetch_stub
-		});
+		fetch_stub = sinon.stub(fetch, "default");
 	});
 	afterEach(function () {
 		fetch_stub.reset();
@@ -28,4 +27,5 @@ describe("get_currency_prices()", function () {
 		await get_currency_prices();
 		expect(res.json.calledOnce).to.be.true;
 	});
+	it("should not handle errors.");
 });

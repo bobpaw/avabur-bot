@@ -5,5 +5,5 @@
  * @license MIT
  */
 
-exports.bot_token = "token";
-exports.sql_pass = "password";
+export const bot_token = "token";
+export const sql_pass = "password";
