@@ -12,9 +12,9 @@ jobs:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
       with:
-        node-version: lts/*
+        node-version: 'lts/*'
         check-latest: false
-        cache: "npm"
+        cache: 'npm'
     - run: npm ci
     - name: Install FOSSA CLI
       run: |
