@@ -9,6 +9,14 @@ on:
     - test/**
     - .eslintrc.json
     - .mocharc.json
+  pull_request:
+    branches: [ '**' ]
+    paths:
+    - package.json
+    - lib/**
+    - test/**
+    - .eslintrc.json
+    - .mocharc.json
 
 jobs:
   build:
