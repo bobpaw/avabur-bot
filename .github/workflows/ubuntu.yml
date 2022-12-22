@@ -9,6 +9,7 @@ on:
     - test/**
     - .eslintrc.json
     - .mocharc.json
+    - .github/workflows/ubuntu.yml
   pull_request:
     branches: [ '**' ]
     paths:
@@ -17,6 +18,8 @@ on:
     - test/**
     - .eslintrc.json
     - .mocharc.json
+    - .github/workflows/ubuntu.yml
+  workflow_dispatch:
 
 jobs:
   build:
