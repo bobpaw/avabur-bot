@@ -1,0 +1,26 @@
+name: FOSSA Scan
+
+on:
+  push:
+    tags: [ 'v*' ]
+
+jobs:
+  fossa:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: lts/*
+        check-latest: false
+        cache: "npm"
+    - run: npm ci
+    - name: Install FOSSA CLI
+      run: |
+        curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash
+        fossa --version
+    - run: fossa init
+    - run: fossa analyze
+      env:
+        FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
+    - run: fossa test
