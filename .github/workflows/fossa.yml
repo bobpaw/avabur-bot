@@ -3,6 +3,10 @@ name: FOSSA Scan
 on:
   push:
     tags: [ 'v*' ]
+  pull_request:
+    paths:
+    - 'package-lock.json'
+    - .github/workflows/fossa.yml
   workflow_dispatch:
 
 jobs:
