@@ -18,7 +18,7 @@ jobs:
     - run: npm ci
     - name: Install FOSSA CLI
       run: |
-        curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash
+        curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh | bash
         fossa --version
     - run: fossa init
     - run: fossa analyze
