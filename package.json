@@ -46,7 +46,7 @@
     "eslint-plugin-jsdoc": "^30.4.0",
     "eslint-plugin-markdown": "^2.2.0",
     "jsdoc": "^3.6.5",
-    "mocha": "^8.4.0",
+    "mocha": "^10.2.0",
     "nodemon": "^2.0.4",
     "nyc": "^15.1.0",
     "proxyquire": "^2.1.3",
