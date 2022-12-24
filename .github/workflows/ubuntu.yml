@@ -36,9 +36,7 @@ jobs:
           node-version: ${{ matrix.version }}
           check-latest: false
           cache: 'npm'
-      - name: npm ci
-        # if: steps.setup-node.outputs.cache-hit != true
-        run: npm ci
+      - run: npm ci
       - run: npm run coverage:ci
       - name: Coveralls Parallel
         uses: coverallsapp/github-action@master
