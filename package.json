@@ -10,6 +10,7 @@
     "pretest": "eslint --cache --cache-location .eslintcache .",
     "test": "nyc --reporter=html --reporter=text mocha",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "coverage:ci": "nyc --reporter=text --reporter=lcov mocha",
     "docs": "jsdoc -c .jsdocrc.json"
   },
   "repository": {

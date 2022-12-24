@@ -1,0 +1,56 @@
+name: Ubuntu
+
+on:
+  push:
+    branches: [ '**' ]
+    paths:
+    - package.json
+    - 'lib/**'
+    - 'test/**'
+    - .eslintrc.json
+    - .mocharc.json
+    - .github/workflows/ubuntu.yml
+  pull_request:
+    branches: [ '**' ]
+    paths:
+    - package.json
+    - 'lib/**'
+    - 'test/**'
+    - .eslintrc.json
+    - .mocharc.json
+    - .github/workflows/ubuntu.yml
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        version: [12, 14, 16, 'lts/*', latest]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.version }}
+          check-latest: false
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run coverage:ci
+      - name: Coveralls Parallel
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          flag-name: node-${{ matrix.version }}
+          parallel: true
+  finish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Coveralls Finish
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
