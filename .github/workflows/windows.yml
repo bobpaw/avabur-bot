@@ -10,7 +10,7 @@ jobs:
   test:
     strategy:
       matrix:
-        version: [ 12, 14, 16, 'lts/*', latest ]
+        version: [ 20, 22, 24, 'lts/*', latest ]
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
