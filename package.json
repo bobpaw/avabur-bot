@@ -9,7 +9,6 @@
     "lint-fix": "eslint --cache --cache-location .eslintcache --fix .",
     "pretest": "eslint --cache --cache-location .eslintcache .",
     "test": "nyc --reporter=html --reporter=text mocha",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
     "coverage:ci": "nyc --reporter=text --reporter=lcov mocha",
     "docs": "jsdoc -c .jsdocrc.json"
   },
@@ -41,12 +40,11 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "coveralls": "^3.1.0",
     "eslint": "^7.28.0",
     "eslint-plugin-jsdoc": "^30.4.0",
     "eslint-plugin-markdown": "^2.2.0",
-    "jsdoc": "^3.6.5",
-    "mocha": "^10.2.0",
+    "jsdoc": "^4.0.5",
+    "mocha": "^11.3.0",
     "nodemon": "^2.0.4",
     "nyc": "^15.1.0",
     "proxyquire": "^2.1.3",
